@@ -99,11 +99,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 10,
     backgroundColor: "rgba(7, 17, 109, 1)",
-    borderRadius: 25, // Este valor hace que el botón tenga bordes redondeados
+    borderRadius: 25, 
     justifyContent: "center",
     alignItems: "center",
-    elevation: 3, // Agrega sombra en Android
-    shadowOpacity: 0.3, // Agrega sombra en iOS
+    elevation: 3, 
+    shadowOpacity: 0.3, 
     shadowRadius: 3,
     shadowOffset: { width: 0, height: 2 },
   },
