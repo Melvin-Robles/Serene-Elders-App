@@ -35,7 +35,7 @@ const LoginComponent = () => {
         style={styles.backgroundImage}
       >
         <View style={styles.loginContainer}>
-          <Text style={styles.welcomeMessage}>¡Bienvenido!</Text>
+          <Text style={styles.welcomeMessage}>¡Bienvenido test!</Text>
         </View>
 
         <View style={styles.bottomSection}>
