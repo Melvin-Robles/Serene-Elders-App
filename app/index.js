@@ -1,12 +1,7 @@
+import { StyleSheet, Text, View } from "react-native";
+import { Link } from "expo-router";
 import React, { useState, useEffect } from "react";
-import {
-  ImageBackground,
-  StyleSheet,
-  Text,
-  View,
-  Dimensions,
-  TouchableOpacity,
-} from "react-native";
+import { ImageBackground, Dimensions, TouchableOpacity } from "react-native";
 import * as Font from "expo-font";
 
 const { width } = Dimensions.get("window");
@@ -22,7 +17,7 @@ const LoginComponent = () => {
 
   const loadFonts = async () => {
     await Font.loadAsync({
-      "roboto-medium": require("../../assets/fonts/Roboto-Medium.ttf"),
+      "roboto-medium": require("../assets/fonts/Roboto-Medium.ttf"),
     });
 
     setFontsLoaded(true);
@@ -31,31 +26,35 @@ const LoginComponent = () => {
   return (
     <View style={styles.container}>
       <ImageBackground
-        source={require("../../assets/background.png")}
+        source={require("../assets/background.png")}
         style={styles.backgroundImage}
       >
         <View style={styles.loginContainer}>
-          <Text style={styles.welcomeMessage}>¡Bienvenido test desde una rama!</Text>
+          <Text style={styles.welcomeMessage}>
+            ¡Bienvenido test desde una rama!
+          </Text>
         </View>
 
         <View style={styles.bottomSection}>
-          <TouchableOpacity
+          <Link
             style={styles.roundedButton}
+            href="components/login"
             onPress={() => console.log("Botón Inicia sesion")}
           >
             <Text style={styles.welcomeMessage}>Iniciar sesión</Text>
-          </TouchableOpacity>
+          </Link>
 
           <Text style={[styles.welcomeMessage, styles.textNouser]}>
             ¿Aún no tienes cuenta?
           </Text>
 
-          <TouchableOpacity
+          <Link
+          href="components/signIn"
             style={styles.roundedButton}
             onPress={() => console.log("Botón Registrarse")}
           >
             <Text style={styles.welcomeMessage}>Registrate</Text>
-          </TouchableOpacity>
+          </Link>
         </View>
       </ImageBackground>
     </View>
@@ -99,11 +98,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 10,
     backgroundColor: "rgba(7, 17, 109, 1)",
-    borderRadius: 25, 
+    borderRadius: 25,
     justifyContent: "center",
     alignItems: "center",
-    elevation: 3, 
-    shadowOpacity: 0.3, 
+    elevation: 3,
+    shadowOpacity: 0.3,
     shadowRadius: 3,
     shadowOffset: { width: 0, height: 2 },
   },
