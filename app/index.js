@@ -1,45 +1,41 @@
 import { StyleSheet, Text, View } from "react-native";
 import { Link } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { ImageBackground, Dimensions } from "react-native";
+import { ImageBackground, Dimensions, Image } from "react-native";
 import LottieView from "lottie-react-native";
 
 const { width } = Dimensions.get("window");
 
 const LoginComponent = () => {
-const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
-useEffect(() => {
-  const timer = setTimeout(() => {
-    setLoading(false);
-  }, 2500);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2500);
 
-  return () => clearTimeout(timer);
-}, []);
+    return () => clearTimeout(timer);
+  }, []);
 
-if (loading) {
-  return (
-<View style={styles.container}>
-      <ImageBackground
-        source={require("../assets/background.png")}
-        style={styles.backgroundImage}
-      >
-
-<View style={styles.loginContainer}>
-<LottieView
-      source={require('../assets/loader.json')}
-      autoPlay
-      loop
-       style={{ width: 300, height: 300 }}
-    />
-        </View>
-
-
-
-      </ImageBackground>
-    </View>
-  );
-}
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ImageBackground
+          source={require("../assets/background.png")}
+          style={styles.backgroundImage}
+        >
+          <View style={styles.loginContainer}>
+            <LottieView
+              source={require("../assets/loader.json")}
+              autoPlay
+              loop
+              style={{ width: 300, height: 300 }}
+            />
+          </View>
+        </ImageBackground>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -48,9 +44,10 @@ if (loading) {
         style={styles.backgroundImage}
       >
         <View style={styles.loginContainer}>
-          <Text style={styles.welcomeMessage}>
-            ¡Bienvenido!
-          </Text>
+          <Image
+          style={styles.title}
+            source={require("../assets/title.png")}
+          ></Image>
         </View>
 
         <View style={styles.bottomSection}>
@@ -67,7 +64,7 @@ if (loading) {
           </Text>
 
           <Link
-          href="components/Home"
+            href="components/signIn"
             style={styles.roundedButton}
             onPress={() => console.log("Botón Registrarse")}
           >
@@ -90,8 +87,10 @@ const styles = StyleSheet.create({
     resizeMode: "cover",
     flex: 1,
   },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
+  title: {
+    flex: 1,
+    width: 500,
+    resizeMode: "contain", 
   },
   loginContainer: {
     flex: 1,
@@ -104,6 +103,7 @@ const styles = StyleSheet.create({
   },
   welcomeMessage: {
     color: "white",
+    
   },
   bottomSection: {
     width: width,
@@ -114,13 +114,13 @@ const styles = StyleSheet.create({
   roundedButton: {
     paddingHorizontal: 20,
     paddingVertical: 10,
+    textAlign: "center",
     backgroundColor: "rgba(7, 17, 109, 1)",
     borderRadius: 25,
-    justifyContent: "center",
-    alignItems: "center",
     elevation: 3,
     shadowOpacity: 0.3,
     shadowRadius: 3,
+    width:300,
     shadowOffset: { width: 0, height: 2 },
   },
   textNouser: {
