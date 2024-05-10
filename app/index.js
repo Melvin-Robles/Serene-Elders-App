@@ -1,27 +1,45 @@
 import { StyleSheet, Text, View } from "react-native";
 import { Link } from "expo-router";
-import React, { useState, useEffect } from "react";
-import { ImageBackground, Dimensions, TouchableOpacity } from "react-native";
-import * as Font from "expo-font";
+import React, { useEffect, useState } from "react";
+import { ImageBackground, Dimensions } from "react-native";
+import LottieView from "lottie-react-native";
 
 const { width } = Dimensions.get("window");
 
 const LoginComponent = () => {
-  const [fontsLoaded, setFontsLoaded] = useState(false);
+const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!fontsLoaded) {
-      loadFonts();
-    }
-  });
+useEffect(() => {
+  const timer = setTimeout(() => {
+    setLoading(false);
+  }, 2500);
 
-  const loadFonts = async () => {
-    await Font.loadAsync({
-      "roboto-medium": require("../assets/fonts/Roboto-Medium.ttf"),
-    });
+  return () => clearTimeout(timer);
+}, []);
 
-    setFontsLoaded(true);
-  };
+if (loading) {
+  return (
+<View style={styles.container}>
+      <ImageBackground
+        source={require("../assets/background.png")}
+        style={styles.backgroundImage}
+      >
+
+<View style={styles.loginContainer}>
+<LottieView
+      source={require('../assets/loader.json')}
+      autoPlay
+      loop
+       style={{ width: 300, height: 300 }}
+    />
+        </View>
+
+
+
+      </ImageBackground>
+    </View>
+  );
+}
 
   return (
     <View style={styles.container}>
@@ -31,7 +49,7 @@ const LoginComponent = () => {
       >
         <View style={styles.loginContainer}>
           <Text style={styles.welcomeMessage}>
-            ¡Bienvenido test desde una rama!
+            ¡Bienvenido!
           </Text>
         </View>
 
@@ -49,7 +67,7 @@ const LoginComponent = () => {
           </Text>
 
           <Link
-          href="components/signIn"
+          href="components/Home"
             style={styles.roundedButton}
             onPress={() => console.log("Botón Registrarse")}
           >
@@ -86,7 +104,6 @@ const styles = StyleSheet.create({
   },
   welcomeMessage: {
     color: "white",
-    fontFamily: "roboto-medium",
   },
   bottomSection: {
     width: width,
@@ -108,6 +125,13 @@ const styles = StyleSheet.create({
   },
   textNouser: {
     padding: 12,
+  },
+  loadingMessage: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    fontSize: 24,
+    color: "black",
   },
 });
 

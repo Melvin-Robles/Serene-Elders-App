@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Text, View, FlatList, TouchableOpacity, ScrollView} from 'react-native';
 
-const App = () => {
+const Home = () => {
     const [menuVisible, setMenuVisible] = useState(false);
 
     const toggleMenu = () => {
@@ -117,4 +117,4 @@ const App = () => {
     </ScrollView>
   );
 };
-export default App;
+export default Home;
