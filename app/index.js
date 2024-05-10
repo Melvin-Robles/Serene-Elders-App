@@ -64,7 +64,7 @@ const LoginComponent = () => {
           </Text>
 
           <Link
-            href="components/Home"
+            href="components/signIn"
             style={styles.roundedButton}
             onPress={() => console.log("Botón Registrarse")}
           >
@@ -92,9 +92,6 @@ const styles = StyleSheet.create({
     width: 500,
     resizeMode: "contain", 
   },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-  },
   loginContainer: {
     flex: 1,
     justifyContent: "center",
@@ -106,6 +103,7 @@ const styles = StyleSheet.create({
   },
   welcomeMessage: {
     color: "white",
+    
   },
   bottomSection: {
     width: width,
@@ -116,13 +114,13 @@ const styles = StyleSheet.create({
   roundedButton: {
     paddingHorizontal: 20,
     paddingVertical: 10,
+    textAlign: "center",
     backgroundColor: "rgba(7, 17, 109, 1)",
     borderRadius: 25,
-    justifyContent: "center",
-    alignItems: "center",
     elevation: 3,
     shadowOpacity: 0.3,
     shadowRadius: 3,
+    width:300,
     shadowOffset: { width: 0, height: 2 },
   },
   textNouser: {
