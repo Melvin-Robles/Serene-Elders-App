@@ -12,7 +12,6 @@ import {
   TextInput,
   KeyboardAvoidingView,
 } from "react-native";
-import LottieView from "lottie-react-native";
 
 const { width } = Dimensions.get("window");
 

@@ -1,12 +1,76 @@
 import { StyleSheet, Text, View } from "react-native";
 import { Link } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { ImageBackground, Dimensions, Image } from "react-native";
+import { ImageBackground, Dimensions, Image, Button, TouchableOpacity, Platform } from "react-native";
 import LottieView from "lottie-react-native";
+import * as WebBrowser from "expo-web-browser";
+import * as Google from "expo-auth-session/providers/google";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as AuthSession from 'expo-auth-session';
+
+
+
 
 const { width } = Dimensions.get("window");
+WebBrowser.maybeCompleteAuthSession();
+
+//web: 852491587122-760acgiho0lj7nb4gjnllvb6e6naaqss.apps.googleusercontent.com
+//android 852491587122-rvfefelt1n45l3hsool150diaj31f45c.apps.googleusercontent.com
 
 const LoginComponent = () => {
+
+/* AUTH */
+
+const [token, setToken] = useState("");
+const [userInfo, setUserInfo] = useState(null);
+
+const [request, response, promptAsync] = Google.useAuthRequest({
+  androidClientId: "852491587122-rvfefelt1n45l3hsool150diaj31f45c.apps.googleusercontent.com",
+  webClientId: "852491587122-760acgiho0lj7nb4gjnllvb6e6naaqss.apps.googleusercontent.com",
+});
+
+useEffect(() => {
+  handleEffect();
+}, [response, token]);
+
+async function handleEffect() {
+  const user = await getLocalUser();
+  if (!user) {
+    if (response?.type === "success") {
+      setToken(response.authentication.accessToken);
+      getUserInfo(response.authentication.accessToken);
+    }
+  } else {
+    setUserInfo(user);
+    console.log(user);
+    console.log("loaded locally");
+  }
+}
+
+const getLocalUser = async () => {
+  const data = await AsyncStorage.getItem("@user");
+  if (!data) return null;
+  return JSON.parse(data);
+};
+
+const getUserInfo = async (token) => {
+  if (!token) return;
+  try {
+    const response = await fetch(
+      "https://www.googleapis.com/userinfo/v2/me",
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    const user = await response.json();
+    await AsyncStorage.setItem("@user", JSON.stringify(user));
+    setUserInfo(user);
+  } catch (error) {
+    // Add your own error handler here
+  }
+};
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -25,12 +89,26 @@ const LoginComponent = () => {
           style={styles.backgroundImage}
         >
           <View style={styles.loginContainer}>
-            <LottieView
+          {Platform.OS === 'web' ? (
+        <View>
+                 <Image
+          style={styles.title}
+            source={require("../assets/splash.png")}
+          ></Image>
+        </View>
+      ) : (
+        <View>
+          <LottieView
               source={require("../assets/loader.json")}
               autoPlay
               loop
               style={{ width: 300, height: 300 }}
-            />
+            />  
+                
+        </View>
+      )}
+
+
           </View>
         </ImageBackground>
       </View>
@@ -70,9 +148,27 @@ const LoginComponent = () => {
           >
             <Text style={styles.welcomeMessage}>Registrate</Text>
           </Link>
+
+          <TouchableOpacity
+        style={[styles.roundedButton, styles.textNouser]}
+        disabled={!request}
+        onPress={() => {
+          promptAsync();
+        }}
+      >
+        <Text style={styles.buttonText}>Modificar</Text>
+      </TouchableOpacity>
+
+
+
         </View>
       </ImageBackground>
+
+
+
     </View>
+
+    
   );
 };
 
