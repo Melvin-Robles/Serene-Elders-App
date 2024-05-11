@@ -34,7 +34,7 @@ const sigIn = () => {
         style={styles.backgroundImage}
       >
         <View style={styles.title}>
-          <Text style={styles.titleText}>Bienvenido!</Text>
+          <Text style={styles.titleText}>Registro de datos!</Text>
 
           <View style={styles.containerForm}>
             <KeyboardAvoidingView style={{ flex: 1, height: 100 }}>
@@ -50,7 +50,6 @@ const sigIn = () => {
                 placeholder="Apellido"
                 value={surname}
                 onChangeText={setSurName}
-                secureTextEntry
                 autoCapitalize="none"
               />
 
@@ -59,7 +58,6 @@ const sigIn = () => {
                 placeholder="Correo Electronico"
                 value={email}
                 onChangeText={setEmail}
-                secureTextEntry
                 autoCapitalize="none"
               />
 
@@ -68,7 +66,6 @@ const sigIn = () => {
                 placeholder="Celular"
                 value={celphone}
                 onChangeText={setCelphone}
-                secureTextEntry
                 autoCapitalize="none"
               />
 
@@ -77,7 +74,6 @@ const sigIn = () => {
                 placeholder="Contraseña"
                 value={password}
                 onChangeText={setPassword}
-                secureTextEntry
                 autoCapitalize="none"
               />
             </KeyboardAvoidingView>
@@ -88,7 +84,7 @@ const sigIn = () => {
           <TouchableOpacity style={styles.roundedButton}>
             <Link
               href="components/home"
-              onPress={() => console.log("Botón Inicia sesion")}
+              onPress={() => console.log("Peticion de registro")}
             >
               <Text style={styles.buttonText}>Registrarme</Text>
             </Link>
