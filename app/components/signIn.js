@@ -1,94 +1,97 @@
 import { StyleSheet, Text, View } from "react-native";
 import { Link } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { ImageBackground, Dimensions, Image, TouchableOpacity, Platform, Alert, Button, TextInput, KeyboardAvoidingView } from "react-native";
+import {
+  ImageBackground,
+  Dimensions,
+  Image,
+  TouchableOpacity,
+  Platform,
+  Alert,
+  Button,
+  TextInput,
+  KeyboardAvoidingView,
+} from "react-native";
 import LottieView from "lottie-react-native";
 
 const { width } = Dimensions.get("window");
 
-
 const sigIn = () => {
-  
+  const [username, setUsername] = useState("");
+  const [surname, setSurName] = useState("");
+  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [celphone, setCelphone] = useState("");
 
-  const [username, setUsername] = useState('');
-  const [surname, setSurName] = useState('');
-  const [password, setPassword] = useState('');
-  const [email, setEmail] = useState('');
-  const [celphone, setCelphone] = useState('');
-  
   const handleLogin = () => {
-    Alert.alert('Login Attempt', `Username: ${username} Password: ${password}`);
+    Alert.alert("Login Attempt", `Username: ${username} Password: ${password}`);
   };
-  
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-    >
-
     <View style={styles.container}>
       <ImageBackground
         source={require("../../assets/background.png")}
         style={styles.backgroundImage}
       >
         <View style={styles.title}>
-          <Text style={styles.titleText}>Bienvenido!</Text>
+          <Text style={styles.titleText}>Registro de datos!</Text>
 
           <View style={styles.containerForm}>
-      <TextInput
-        style={styles.input}
-        placeholder="Nombre"
-        value={username}
-        onChangeText={setUsername}
-        autoCapitalize="none"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Apellido"
-        value={surname}
-        onChangeText={setSurName}
-        secureTextEntry
-        autoCapitalize="none"
-      />
+            <KeyboardAvoidingView style={{ flex: 1, height: 100 }}>
+              <TextInput
+                style={styles.input}
+                placeholder="Nombre"
+                value={username}
+                onChangeText={setUsername}
+                autoCapitalize="none"
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Apellido"
+                value={surname}
+                onChangeText={setSurName}
+                autoCapitalize="none"
+              />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Correo Electronico"
-        value={email}
-        onChangeText={setEmail}
-        secureTextEntry 
-        autoCapitalize="none"
-      />
+              <TextInput
+                style={styles.input}
+                placeholder="Correo Electronico"
+                value={email}
+                onChangeText={setEmail}
+                autoCapitalize="none"
+              />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Celular"
-        value={celphone}
-        onChangeText={setCelphone}
-        secureTextEntry 
-        autoCapitalize="none"
-      />
+              <TextInput
+                style={styles.input}
+                placeholder="Celular"
+                value={celphone}
+                onChangeText={setCelphone}
+                autoCapitalize="none"
+              />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Contraseña"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry 
-        autoCapitalize="none"
-      />
-      <TouchableOpacity href="../components/Home"  style={styles.roundedButton}  onPress={handleLogin} >
-      <Text style={styles.buttonText}>Registrarme</Text>
-      </TouchableOpacity>
-    </View>
+              <TextInput
+                style={styles.input}
+                placeholder="Contraseña"
+                value={password}
+                onChangeText={setPassword}
+                autoCapitalize="none"
+              />
+            </KeyboardAvoidingView>
+          </View>
         </View>
 
         <View style={styles.bottomSection}>
-
+          <TouchableOpacity style={styles.roundedButton}>
+            <Link
+              href="components/home"
+              onPress={() => console.log("Peticion de registro")}
+            >
+              <Text style={styles.buttonText}>Registrarme</Text>
+            </Link>
+          </TouchableOpacity>
         </View>
       </ImageBackground>
     </View>
-    </KeyboardAvoidingView>
   );
 };
 
@@ -110,7 +113,7 @@ const styles = StyleSheet.create({
   },
   titleText: {
     fontSize: 36,
-    color: "white"
+    color: "white",
   },
   buttonText: {
     color: "white",
@@ -136,7 +139,7 @@ const styles = StyleSheet.create({
   input: {
     height: 40,
     borderRadius: 25,
-    borderColor: 'gray',
+    borderColor: "gray",
     backgroundColor: "white",
     borderWidth: 1,
     marginBottom: 20,
