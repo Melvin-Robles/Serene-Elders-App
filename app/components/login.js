@@ -64,7 +64,7 @@ const login = () => {
         <View style={styles.bottomSection}>
           <TouchableOpacity style={styles.roundedButton}>
             <Link
-              href="components/home"
+              href="components/perfil"
               onPress={() => console.log("Peticion de registro")}
             >
               <Text style={styles.buttonText}>Inicia</Text>
