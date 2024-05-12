@@ -12,6 +12,9 @@ import {
   TextInput,
   KeyboardAvoidingView,
 } from "react-native";
+import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { initializeApp } from 'firebase/app';
+import { firebaseConfig } from '../../firebase-config';
 
 const { width } = Dimensions.get("window");
 
@@ -22,8 +25,27 @@ const sigIn = () => {
   const [email, setEmail] = useState("");
   const [celphone, setCelphone] = useState("");
 
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+
+  const handleCreateAccount = () => {
+    console.log('Account created!')
+    createUserWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+      console.log('Account created!')
+      const user = userCredential.user;
+      console.log(user)
+    })
+    .catch(error => {
+      console.log(error)
+      Alert.alert(error.message)
+    })
+  }
+
+
   const handleLogin = () => {
-    Alert.alert("Login Attempt", `Username: ${username} Password: ${password}`);
+    Alert.alert("Login Attempt", `Username: ${username} Password: ${email}`);
   };
 
   return (
@@ -82,13 +104,9 @@ const sigIn = () => {
             </View>
   
         <View style={styles.bottomSection}>
-              <TouchableOpacity style={styles.roundedButton}>
-                <Link
-                  href="components/home"
-                  onPress={() => console.log("Peticion de registro")}
-                >
+              <TouchableOpacity onPress={handleCreateAccount} style={styles.roundedButton}>
+       
                   <Text style={styles.buttonText}>Registrarme</Text>
-                </Link>
               </TouchableOpacity>
             </View>
           </ImageBackground>
