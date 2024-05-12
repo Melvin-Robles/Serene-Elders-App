@@ -1,7 +1,10 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
+import AgregarCitaForm from './AgregarCitaForm';
 
 const TusCitasScreen = () => {
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
   // Datos de ejemplo
   const proximasCitas = [
     { paciente: "Juan Perez", hora: "10:00 AM" },
@@ -13,14 +16,26 @@ const TusCitasScreen = () => {
     { paciente: "Ana Martinez", hora: "01:45 PM" },
   ];
 
+  const toggleModal = () => {
+    setIsModalVisible(!isModalVisible);
+  };
+
+  const agregarCita = (nuevaCita) => {
+    console.log('Nueva cita:', nuevaCita);
+    // Aquí puedes implementar la lógica para agregar la nueva cita a tus datos
+    // Por ahora, solo lo mostramos en la consola
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerText}>Tus citas</Text>
-        <TouchableOpacity style={styles.addButton}>
+        <TouchableOpacity style={styles.addButton} onPress={toggleModal}>
           <Text style={styles.buttonText}>Agregar cita</Text>
         </TouchableOpacity>
       </View>
+      
+      <View style={styles.space} />
       <View style={styles.sectionContainer}>
         <Text style={styles.sectionHeaderText}>Mis próximas citas</Text>
         {proximasCitas.map((cita, index) => (
@@ -36,6 +51,7 @@ const TusCitasScreen = () => {
           </View>
         ))}
       </View>
+      <View style={styles.space} />
       <View style={styles.sectionContainer}>
         <Text style={styles.sectionHeaderText}>Citas creadas recientemente</Text>
         {citasRecientes.map((cita, index) => (
@@ -51,6 +67,11 @@ const TusCitasScreen = () => {
           </View>
         ))}
       </View>
+      <Modal visible={isModalVisible} animationType="slide" transparent={true}>
+        <View style={styles.modalContainer}>
+          <AgregarCitaForm onCancelar={toggleModal} onAgregar={agregarCita} />
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -93,6 +114,9 @@ const styles = StyleSheet.create({
     color: '#1E90FF',
     fontWeight: 'bold',
   },
+  space: {
+    marginBottom: 20,
+  },
   sectionContainer: {
     marginBottom: 20,
   },
@@ -134,7 +158,14 @@ const styles = StyleSheet.create({
   horaText: {
     fontSize: 14,
   },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fondo oscuro semi-transparente
+  },
 });
 
 export default TusCitasScreen;
+
 
