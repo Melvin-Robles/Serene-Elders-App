@@ -27,6 +27,7 @@ const login = () => {
   };
 
   return (
+      <KeyboardAvoidingView style={{ flex: 1 }}>
     <View style={styles.container}>
       <ImageBackground
         source={require("../../assets/background.png")}
@@ -36,7 +37,6 @@ const login = () => {
           <Text style={styles.titleText}>Inicia sesión!</Text>
 
           <View style={styles.containerForm}>
-            <KeyboardAvoidingView style={{ flex: 1, height: 100 }}>
 
 
               <TextInput
@@ -56,7 +56,7 @@ const login = () => {
                 secureTextEntry
                 autoCapitalize="none"
               />
-            </KeyboardAvoidingView>
+            
           </View>
         </View>
 
@@ -72,6 +72,7 @@ const login = () => {
         </View>
       </ImageBackground>
     </View>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -101,7 +102,8 @@ const styles = StyleSheet.create({
   },
   bottomSection: {
     width: width,
-    height: 250,
+    height: 100,
+    marginBottom:10,
     justifyContent: "center",
     alignItems: "center",
   },

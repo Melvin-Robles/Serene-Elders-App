@@ -27,70 +27,74 @@ const sigIn = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <ImageBackground
-        source={require("../../assets/background.png")}
-        style={styles.backgroundImage}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
       >
-        <View style={styles.title}>
-          <Text style={styles.titleText}>Registro de datos!</Text>
-
-          <View style={styles.containerForm}>
-            <KeyboardAvoidingView style={{ flex: 1, height: 100 }}>
-              <TextInput
-                style={styles.input}
-                placeholder="Nombre"
-                value={username}
-                onChangeText={setUsername}
-                autoCapitalize="none"
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="Apellido"
-                value={surname}
-                onChangeText={setSurName}
-                autoCapitalize="none"
-              />
-
-              <TextInput
-                style={styles.input}
-                placeholder="Correo Electronico"
-                value={email}
-                onChangeText={setEmail}
-                autoCapitalize="none"
-              />
-
-              <TextInput
-                style={styles.input}
-                placeholder="Celular"
-                value={celphone}
-                onChangeText={setCelphone}
-                autoCapitalize="none"
-              />
-
-              <TextInput
-                style={styles.input}
-                placeholder="Contraseña"
-                value={password}
-                onChangeText={setPassword}
-                autoCapitalize="none"
-              />
-            </KeyboardAvoidingView>
-          </View>
-        </View>
-
+        <View style={styles.container}>
+          <ImageBackground
+            source={require("../../assets/background.png")}
+            style={styles.backgroundImage}
+          >
+            <View style={styles.title}>
+              <Text style={styles.titleText}>Registro de datos!</Text>
+  
+              <View style={styles.containerForm}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Nombre"
+                  value={username}
+                  onChangeText={setUsername}
+                  autoCapitalize="none"
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Apellido"
+                  value={surname}
+                  onChangeText={setSurName}
+                  autoCapitalize="none"
+                />
+  
+                <TextInput
+                  style={styles.input}
+                  placeholder="Correo Electronico"
+                  value={email}
+                  onChangeText={setEmail}
+                  autoCapitalize="none"
+                />
+  
+                <TextInput
+                  style={styles.input}
+                  placeholder="Celular"
+                  value={celphone}
+                  onChangeText={setCelphone}
+                  autoCapitalize="none"
+                />
+  
+                <TextInput
+                  style={styles.input}
+                  placeholder="Contraseña"
+                  value={password}
+                  secureTextEntry
+                  onChangeText={setPassword}
+                  autoCapitalize="none"
+                />
+              </View>
+            </View>
+  
         <View style={styles.bottomSection}>
-          <TouchableOpacity style={styles.roundedButton}>
-            <Link
-              href="components/home"
-              onPress={() => console.log("Peticion de registro")}
-            >
-              <Text style={styles.buttonText}>Registrarme</Text>
-            </Link>
-          </TouchableOpacity>
+              <TouchableOpacity style={styles.roundedButton}>
+                <Link
+                  href="components/home"
+                  onPress={() => console.log("Peticion de registro")}
+                >
+                  <Text style={styles.buttonText}>Registrarme</Text>
+                </Link>
+              </TouchableOpacity>
+            </View>
+          </ImageBackground>
         </View>
-      </ImageBackground>
-    </View>
+      </KeyboardAvoidingView>
+   
   );
 };
 
@@ -120,7 +124,8 @@ const styles = StyleSheet.create({
   },
   bottomSection: {
     width: width,
-    height: 250,
+    height: 50,
+    marginBottom:10,
     justifyContent: "center",
     alignItems: "center",
   },
