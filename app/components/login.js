@@ -1,31 +1,77 @@
 import { StyleSheet, Text, View } from "react-native";
-import { Link } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, {  useState } from "react";
 import {
   ImageBackground,
   Dimensions,
-  Image,
   TouchableOpacity,
-  Platform,
   Alert,
-  Button,
   TextInput,
   KeyboardAvoidingView,
+  ActivityIndicator
 } from "react-native";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import { initializeApp } from 'firebase/app';
-import { firebaseConfig } from '../../firebase-config';
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { initializeApp } from "firebase/app";
+import { firebaseConfig } from "../../firebase-config";
+
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { useNavigation } from "@react-navigation/native";
+import { getFirestore, doc, getDoc  } from "firebase/firestore";
+import Home from "./home";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 
 
 const { width } = Dimensions.get("window");
 
-const login = () => {
+const Login = () => {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
 
-  const handleLogin = () => {
-    Alert.alert("Login Attempt", `Username: ${username} Password: ${password}`);
-  };
+  const [isLoading, setIsLoading] = useState(false);
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const navigation = useNavigation();
+
+  const handleSignIn = () => {
+    setIsLoading(true);
+    signInWithEmailAndPassword(auth, email, password)
+      .then(async (userCredential) => { 
+        console.log('Signed in!');
+        const user = userCredential.user;
+        console.log(user);
+  
+        const db = getFirestore();
+        const userRef = doc(db, "users", user.uid);
+        try {
+          const docSnap = await getDoc(userRef);
+          if (docSnap.exists()) {
+            console.log("Datos del usuario:", docSnap.data());
+            const userInfo = await docSnap.data()
+            await AsyncStorage.setItem("@userInfo",  JSON.stringify(userInfo));
+
+          } else {
+            console.log("No se encontraron datos del usuario!");
+          }
+        } catch (error) {
+          console.error("Error al obtener datos del usuario:", error);
+          Alert.alert("Error al obtener datos del usuario: " + error.message);
+        }
+  
+        navigation.navigate('Home');
+        setIsLoading(false);
+      })
+      .catch(error => {
+        setIsLoading(false);
+        Alert.alert(
+         error.message
+        );
+      });
+  }
+  
+
+
 
   return (
       <KeyboardAvoidingView style={{ flex: 1 }}>
@@ -35,8 +81,6 @@ const login = () => {
         style={styles.backgroundImage}
       >
         <View style={styles.title}>
-          <Text style={styles.titleText}>Inicia sesión!</Text>
-
           <View style={styles.containerForm}>
 
 
@@ -45,7 +89,7 @@ const login = () => {
                 placeholder="Correo Electronico"
                 value={email}
                 onChangeText={setEmail}
-                secureTextEntry
+                
                 autoCapitalize="none"
               />
 
@@ -62,20 +106,35 @@ const login = () => {
         </View>
 
         <View style={styles.bottomSection}>
-          <TouchableOpacity style={styles.roundedButton}>
-            <Link
-              href="components/home"
-              onPress={() => console.log("Peticion de registro")}
-            >
-              <Text style={styles.buttonText}>Inicia</Text>
-            </Link>
-          </TouchableOpacity>
+        {isLoading ? (
+              <ActivityIndicator size="large" color="#0000ff" />
+            ) : (
+              <TouchableOpacity
+                onPress={handleSignIn}
+                style={styles.roundedButton}
+              >
+                <Text style={styles.buttonText}>Entrar</Text>
+              </TouchableOpacity>
+            )}
         </View>
       </ImageBackground>
     </View>
     </KeyboardAvoidingView>
   );
 };
+
+const Stack = createNativeStackNavigator();
+
+export default function App() {
+  return (
+    <NavigationContainer independent={true}>
+      <Stack.Navigator initialRouteName="logIn">
+        <Stack.Screen name="Inicia Sesion!" component={Login} />
+        <Stack.Screen name="Home" component={Home} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -135,4 +194,3 @@ const styles = StyleSheet.create({
   },
 });
 
-export default login;

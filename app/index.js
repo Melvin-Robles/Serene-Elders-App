@@ -24,6 +24,8 @@ const [request, response, promptAsync] = Google.useAuthRequest({
 });
 
 useEffect(() => {
+  AsyncStorage.removeItem("@userInfo");
+  AsyncStorage.removeItem("@user");
   handleEffect();
 }, [response, token]);
 
@@ -100,8 +102,6 @@ const getUserInfo = async (token) => {
                 
         </View>
       )}
-
-
           </View>
         </ImageBackground>
       </View>
