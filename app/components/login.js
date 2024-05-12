@@ -12,20 +12,45 @@ import {
   TextInput,
   KeyboardAvoidingView,
 } from "react-native";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import { initializeApp } from 'firebase/app';
-import { firebaseConfig } from '../../firebase-config';
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { initializeApp } from "firebase/app";
+import { firebaseConfig } from "../../firebase-config";
+
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { useNavigation } from "@react-navigation/native";
+import { getFirestore, doc, setDoc } from "firebase/firestore";
+import Home from "./home";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 
 
 const { width } = Dimensions.get("window");
 
-const login = () => {
+const Login = () => {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
 
-  const handleLogin = () => {
-    Alert.alert("Login Attempt", `Username: ${username} Password: ${password}`);
-  };
+  const [isLoading, setIsLoading] = useState(false);
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const navigation = useNavigation();
+
+  const handleSignIn = () => {
+    signInWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+      console.log('Signed in!')
+      const user = userCredential.user;
+      console.log(user)
+      navigation.navigate('Home');
+    })
+    .catch(error => {
+      console.log(error)
+    })
+  }
+
+
 
   return (
       <KeyboardAvoidingView style={{ flex: 1 }}>
@@ -45,7 +70,7 @@ const login = () => {
                 placeholder="Correo Electronico"
                 value={email}
                 onChangeText={setEmail}
-                secureTextEntry
+                
                 autoCapitalize="none"
               />
 
@@ -62,20 +87,35 @@ const login = () => {
         </View>
 
         <View style={styles.bottomSection}>
-          <TouchableOpacity style={styles.roundedButton}>
-            <Link
-              href="components/home"
-              onPress={() => console.log("Peticion de registro")}
-            >
-              <Text style={styles.buttonText}>Inicia</Text>
-            </Link>
-          </TouchableOpacity>
+        {isLoading ? (
+              <ActivityIndicator size="large" color="#0000ff" />
+            ) : (
+              <TouchableOpacity
+                onPress={handleSignIn}
+                style={styles.roundedButton}
+              >
+                <Text style={styles.buttonText}>Entrar</Text>
+              </TouchableOpacity>
+            )}
         </View>
       </ImageBackground>
     </View>
     </KeyboardAvoidingView>
   );
 };
+
+const Stack = createNativeStackNavigator();
+
+export default function App() {
+  return (
+    <NavigationContainer independent={true}>
+      <Stack.Navigator initialRouteName="logIn">
+        <Stack.Screen name="Registrate!" component={Login} />
+        <Stack.Screen name="Home" component={Home} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -135,4 +175,3 @@ const styles = StyleSheet.create({
   },
 });
 
-export default login;

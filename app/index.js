@@ -100,8 +100,6 @@ const getUserInfo = async (token) => {
                 
         </View>
       )}
-
-
           </View>
         </ImageBackground>
       </View>
