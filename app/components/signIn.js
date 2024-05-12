@@ -1,56 +1,101 @@
 import { StyleSheet, Text, View } from "react-native";
-import { Link } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   ImageBackground,
   Dimensions,
-  Image,
   TouchableOpacity,
-  Platform,
   Alert,
-  Button,
   TextInput,
   KeyboardAvoidingView,
+  ActivityIndicator,
 } from "react-native";
-import LottieView from "lottie-react-native";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { initializeApp } from "firebase/app";
+import { firebaseConfig } from "../../firebase-config";
+
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { useNavigation } from "@react-navigation/native";
+import { getFirestore, doc, setDoc } from "firebase/firestore";
+import Home from "./home";
 
 const { width } = Dimensions.get("window");
 
-const sigIn = () => {
-  const [username, setUsername] = useState("");
+function SigIn() {
+  const [userName, setUsername] = useState("");
   const [surname, setSurName] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [celphone, setCelphone] = useState("");
 
-  const handleLogin = () => {
-    Alert.alert("Login Attempt", `Username: ${username} Password: ${password}`);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const navigation = useNavigation();
+
+  const handleCreateAccount = () => {
+    setIsLoading(true);
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        const db = getFirestore();
+        const userRef = doc(db, "users", userCredential.user.uid);
+        setDoc(userRef, {
+          email: email,
+          name: userName,
+          surname: surname,
+          celphone: celphone,
+          createdAt: new Date(),
+          rol: null,
+        })
+          .then(() => {
+            Alert.alert("Usuario registrado");
+            navigation.navigate("Home");
+            setIsLoading(false);
+          })
+          .catch((error) => {
+            Alert.alert(
+              "Error al guardar el usuario en Firestore: " + error.message
+            );
+            setIsLoading(false);
+          });
+      })
+      .catch((error) => {
+        console.log(error);
+        setIsLoading(false);
+        Alert.alert(error.message);
+      });
   };
 
   return (
-    <View style={styles.container}>
-      <ImageBackground
-        source={require("../../assets/background.png")}
-        style={styles.backgroundImage}
-      >
-        <View style={styles.title}>
-          <Text style={styles.titleText}>Registro de datos!</Text>
-
-          <View style={styles.containerForm}>
-            <KeyboardAvoidingView style={{ flex: 1, height: 100 }}>
+    <KeyboardAvoidingView style={{ flex: 1 }}>
+      <View style={styles.container}>
+        <ImageBackground
+          source={require("../../assets/background.png")}
+          style={styles.backgroundImage}
+        >
+          <View style={styles.title}>
+            <View style={styles.containerForm}>
               <TextInput
                 style={styles.input}
                 placeholder="Nombre"
-                value={username}
-                onChangeText={setUsername}
-                autoCapitalize="none"
+                value={userName}
+                onChangeText={(text) => {
+                  const formattedText = text.replace(/[^a-zA-Z\s]/g, "");
+                  setUsername(formattedText);
+                }}
+                autoCapitalize="words"
               />
+
               <TextInput
                 style={styles.input}
                 placeholder="Apellido"
                 value={surname}
-                onChangeText={setSurName}
-                autoCapitalize="none"
+                onChangeText={(text) => {
+                  const formattedText = text.replace(/[^a-zA-Z\s]/g, "");
+                  setSurName(formattedText);
+                }}
+                autoCapitalize="words"
               />
 
               <TextInput
@@ -65,7 +110,12 @@ const sigIn = () => {
                 style={styles.input}
                 placeholder="Celular"
                 value={celphone}
-                onChangeText={setCelphone}
+                onChangeText={(text) => {
+                  const formattedText = text.replace(/[^0-9]/g, "").slice(0, 8);
+                  setCelphone(formattedText);
+                }}
+                keyboardType="number-pad"
+                maxLength={8}
                 autoCapitalize="none"
               />
 
@@ -73,27 +123,43 @@ const sigIn = () => {
                 style={styles.input}
                 placeholder="Contraseña"
                 value={password}
+                secureTextEntry
                 onChangeText={setPassword}
                 autoCapitalize="none"
               />
-            </KeyboardAvoidingView>
+            </View>
           </View>
-        </View>
 
-        <View style={styles.bottomSection}>
-          <TouchableOpacity style={styles.roundedButton}>
-            <Link
-              href="components/home"
-              onPress={() => console.log("Peticion de registro")}
-            >
-              <Text style={styles.buttonText}>Registrarme</Text>
-            </Link>
-          </TouchableOpacity>
-        </View>
-      </ImageBackground>
-    </View>
+          <View style={styles.bottomSection}>
+            {isLoading ? (
+              <ActivityIndicator size="large" color="#0000ff" />
+            ) : (
+              <TouchableOpacity
+                onPress={handleCreateAccount}
+                style={styles.roundedButton}
+              >
+                <Text style={styles.buttonText}>Registrarme</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        </ImageBackground>
+      </View>
+    </KeyboardAvoidingView>
   );
-};
+}
+
+const Stack = createNativeStackNavigator();
+
+export default function App() {
+  return (
+    <NavigationContainer independent={true}>
+      <Stack.Navigator initialRouteName="sigIn">
+        <Stack.Screen name="Registrate!" component={SigIn} />
+        <Stack.Screen name="Home" component={Home} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -121,7 +187,8 @@ const styles = StyleSheet.create({
   },
   bottomSection: {
     width: width,
-    height: 250,
+    height: 50,
+    marginBottom: 10,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -151,5 +218,3 @@ const styles = StyleSheet.create({
     padding: 10,
   },
 });
-
-export default sigIn;

@@ -12,22 +12,23 @@ import {
   TextInput,
   KeyboardAvoidingView,
 } from "react-native";
-import LottieView from "lottie-react-native";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { initializeApp } from 'firebase/app';
+import { firebaseConfig } from '../../firebase-config';
+
 
 const { width } = Dimensions.get("window");
 
 const login = () => {
-  const [username, setUsername] = useState("");
-  const [surname, setSurName] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
-  const [celphone, setCelphone] = useState("");
 
   const handleLogin = () => {
     Alert.alert("Login Attempt", `Username: ${username} Password: ${password}`);
   };
 
   return (
+      <KeyboardAvoidingView style={{ flex: 1 }}>
     <View style={styles.container}>
       <ImageBackground
         source={require("../../assets/background.png")}
@@ -37,7 +38,6 @@ const login = () => {
           <Text style={styles.titleText}>Inicia sesión!</Text>
 
           <View style={styles.containerForm}>
-            <KeyboardAvoidingView style={{ flex: 1, height: 100 }}>
 
 
               <TextInput
@@ -57,14 +57,14 @@ const login = () => {
                 secureTextEntry
                 autoCapitalize="none"
               />
-            </KeyboardAvoidingView>
+            
           </View>
         </View>
 
         <View style={styles.bottomSection}>
           <TouchableOpacity style={styles.roundedButton}>
             <Link
-              href="components/perfil"
+              href="components/home"
               onPress={() => console.log("Peticion de registro")}
             >
               <Text style={styles.buttonText}>Inicia</Text>
@@ -73,6 +73,7 @@ const login = () => {
         </View>
       </ImageBackground>
     </View>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -102,7 +103,8 @@ const styles = StyleSheet.create({
   },
   bottomSection: {
     width: width,
-    height: 250,
+    height: 100,
+    marginBottom:10,
     justifyContent: "center",
     alignItems: "center",
   },
