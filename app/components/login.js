@@ -1,16 +1,13 @@
 import { StyleSheet, Text, View } from "react-native";
-import { Link } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, {  useState } from "react";
 import {
   ImageBackground,
   Dimensions,
-  Image,
   TouchableOpacity,
-  Platform,
   Alert,
-  Button,
   TextInput,
   KeyboardAvoidingView,
+  ActivityIndicator
 } from "react-native";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { initializeApp } from "firebase/app";
@@ -19,7 +16,7 @@ import { firebaseConfig } from "../../firebase-config";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
-import { getFirestore, doc, setDoc } from "firebase/firestore";
+import { getFirestore, doc, getDoc  } from "firebase/firestore";
 import Home from "./home";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -38,17 +35,41 @@ const Login = () => {
   const navigation = useNavigation();
 
   const handleSignIn = () => {
+    setIsLoading(true);
     signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      console.log('Signed in!')
-      const user = userCredential.user;
-      console.log(user)
-      navigation.navigate('Home');
-    })
-    .catch(error => {
-      console.log(error)
-    })
+      .then(async (userCredential) => { 
+        console.log('Signed in!');
+        const user = userCredential.user;
+        console.log(user);
+  
+        const db = getFirestore();
+        const userRef = doc(db, "users", user.uid);
+        try {
+          const docSnap = await getDoc(userRef);
+          if (docSnap.exists()) {
+            console.log("Datos del usuario:", docSnap.data());
+            const userInfo = await docSnap.data()
+            await AsyncStorage.setItem("@userInfo",  JSON.stringify(userInfo));
+
+          } else {
+            console.log("No se encontraron datos del usuario!");
+          }
+        } catch (error) {
+          console.error("Error al obtener datos del usuario:", error);
+          Alert.alert("Error al obtener datos del usuario: " + error.message);
+        }
+  
+        navigation.navigate('Home');
+        setIsLoading(false);
+      })
+      .catch(error => {
+        setIsLoading(false);
+        Alert.alert(
+         error.message
+        );
+      });
   }
+  
 
 
 
@@ -60,8 +81,6 @@ const Login = () => {
         style={styles.backgroundImage}
       >
         <View style={styles.title}>
-          <Text style={styles.titleText}>Inicia sesión!</Text>
-
           <View style={styles.containerForm}>
 
 
@@ -110,7 +129,7 @@ export default function App() {
   return (
     <NavigationContainer independent={true}>
       <Stack.Navigator initialRouteName="logIn">
-        <Stack.Screen name="Registrate!" component={Login} />
+        <Stack.Screen name="Inicia Sesion!" component={Login} />
         <Stack.Screen name="Home" component={Home} />
       </Stack.Navigator>
     </NavigationContainer>

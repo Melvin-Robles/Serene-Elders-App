@@ -1,8 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Text, View, FlatList, TouchableOpacity, Image} from 'react-native';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Link } from "expo-router";
+
+
 
 const Home = () => {
     const [menuVisible, setMenuVisible] = useState(false);
+
+    const [name, setName] = useState('');
+    const [surname, setSurname] = useState('');
+
+
+    const getLocalUser = async () => {
+      const data = await AsyncStorage.getItem("@userInfo");
+      const dataParsed =  JSON.parse(data)
+      if (dataParsed) {
+        setName(dataParsed.name);      
+        setSurname(dataParsed.surname); 
+      }
+    };
+
+    useEffect(() => {
+      getLocalUser();
+    }, []);
+    
 
     const toggleMenu = () => {
         setMenuVisible(!menuVisible);
@@ -44,9 +66,15 @@ const Home = () => {
         </TouchableOpacity>
         {menuVisible && (
           <View style={{ position: 'absolute', top: 30, right: 10,  zIndex: 1}}>
-            <TouchableOpacity style={{ backgroundColor: '#1499C3', borderRadius: 5, marginTop: 5, flexDirection: 'row', alignItems: 'center', padding: 10, paddingLeft:25 }}>
+            <TouchableOpacity  style={{ backgroundColor: '#1499C3', borderRadius: 5, marginTop: 5, flexDirection: 'row', alignItems: 'center', padding: 10, paddingLeft:25 }}>
               <Image source={require('../../assets/Calendar.png')} style={{ width: 25, height: 25 }} />
+              <Link
+          href="components/TusCitasScreen"
+
+          >
+
               <Text  style={{ color: 'white' }}> Tus citas</Text>
+          </Link>
             </TouchableOpacity>
             <TouchableOpacity style={{backgroundColor: '#8D16AB', borderRadius: 5, marginTop: 5, flexDirection: 'row', alignItems: 'center', padding: 10, paddingLeft:25 }}>
               <Image source={require('../../assets/Paciente.png')} style={{ width: 25, height: 25 }} />
@@ -72,7 +100,7 @@ const Home = () => {
         Bienvenido de nuevo
       </Text>
       <Text style={{ fontSize: 40, fontWeight: 'bold', marginTop: 5 }}>
-        Dr. Alex Siguenza
+      <Text>{name} {surname}</Text>
       </Text>
       <Text style={{ fontSize: 16, fontWeight: 'bold', marginTop: 5,  fontWeight: 'light' }}>
         ¿Cómo podemos ayudarte ahora?
@@ -129,4 +157,6 @@ const Home = () => {
     
   );
 };
+
+
 export default Home;

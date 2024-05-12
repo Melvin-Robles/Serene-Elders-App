@@ -55,7 +55,7 @@ function SigIn() {
           })
           .catch((error) => {
             Alert.alert(
-              "Error al guardar el usuario en Firestore: " + error.message
+              "Error" + error.message
             );
             setIsLoading(false);
           });
