@@ -53,7 +53,7 @@ const LoginComponent = () => {
         <View style={styles.bottomSection}>
           <Link
             style={styles.roundedButton}
-            href="components/login"
+            href="components/TusCitasScreen"
             onPress={() => console.log("Botón Inicia sesion")}
           >
             <Text style={styles.welcomeMessage}>Iniciar sesión</Text>
