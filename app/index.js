@@ -6,16 +6,10 @@ import LottieView from "lottie-react-native";
 import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as AuthSession from 'expo-auth-session';
-
-
 
 
 const { width } = Dimensions.get("window");
 WebBrowser.maybeCompleteAuthSession();
-
-//web: 852491587122-760acgiho0lj7nb4gjnllvb6e6naaqss.apps.googleusercontent.com
-//android 852491587122-rvfefelt1n45l3hsool150diaj31f45c.apps.googleusercontent.com
 
 const LoginComponent = () => {
 
@@ -67,7 +61,6 @@ const getUserInfo = async (token) => {
     await AsyncStorage.setItem("@user", JSON.stringify(user));
     setUserInfo(user);
   } catch (error) {
-    // Add your own error handler here
   }
 };
 
@@ -150,13 +143,13 @@ const getUserInfo = async (token) => {
           </Link>
 
           <TouchableOpacity
-        style={[styles.roundedButton, styles.textNouser]}
+        style={[styles.roundedButton, styles.textMargin]}
         disabled={!request}
         onPress={() => {
           promptAsync();
         }}
       >
-        <Text style={styles.buttonText}>Modificar</Text>
+        <Text style={[styles.welcomeMessage, styles.textNouser]}>Inicia con Google!</Text>
       </TouchableOpacity>
 
 
@@ -199,7 +192,7 @@ const styles = StyleSheet.create({
   },
   welcomeMessage: {
     color: "white",
-    
+    textAlign:"center"
   },
   bottomSection: {
     width: width,
@@ -221,6 +214,9 @@ const styles = StyleSheet.create({
   },
   textNouser: {
     padding: 12,
+  },
+  textMargin: {
+    margin: 5,
   },
   loadingMessage: {
     flex: 1,
