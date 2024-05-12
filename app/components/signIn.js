@@ -16,8 +16,10 @@ import { firebaseConfig } from "../../firebase-config";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
-import { getFirestore, doc, setDoc } from "firebase/firestore";
+import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
 import Home from "./home";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 
 const { width } = Dimensions.get("window");
 
@@ -48,8 +50,23 @@ function SigIn() {
           createdAt: new Date(),
           rol: null,
         })
-          .then(() => {
+          .then(async() => {
             Alert.alert("Usuario registrado");
+
+            const db = getFirestore();
+            const userRef = doc(db, "users", userCredential.user.uid);
+            try {
+              const docSnap = await getDoc(userRef);
+              if (docSnap.exists()) {
+                const userInfo = await docSnap.data()
+                console.log(docSnap.data(), "docSnap");
+                await AsyncStorage.setItem("@userInfo",  JSON.stringify(userInfo));
+    
+              } 
+            } catch (error) {
+              Alert.alert("Error al obtener datos del usuario: " + error.message);
+            }
+
             navigation.navigate("Home");
             setIsLoading(false);
           })

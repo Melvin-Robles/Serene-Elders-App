@@ -51,11 +51,8 @@ const Login = () => {
             const userInfo = await docSnap.data()
             await AsyncStorage.setItem("@userInfo",  JSON.stringify(userInfo));
 
-          } else {
-            console.log("No se encontraron datos del usuario!");
-          }
+          } 
         } catch (error) {
-          console.error("Error al obtener datos del usuario:", error);
           Alert.alert("Error al obtener datos del usuario: " + error.message);
         }
   
