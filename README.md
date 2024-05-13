@@ -17,6 +17,8 @@
  - [Enlace a Mockups] https://www.figma.com/file/vTujn1wAmLwS47Y9Fuf9si/APP--HOGAR-DE-ANCIANOS?type=design&node-id=0%3A1&mode=dev&t=nMT7ntTYosOLHdyP-1
 
  - [Enlace a Word- Manual Tecnico] https://udbedu-my.sharepoint.com/:w:/g/personal/af231735_alumno_udb_edu_sv/EV4FwZIj7qZMk7hveMqGd74BgV9HpaBfpRDnAwm-3HDuiw?e=3J60gQ
+
+ - [Enlace a Word - Manual de usuario] https://udbedu-my.sharepoint.com/:w:/g/personal/af231735_alumno_udb_edu_sv/EYU_MvpB-cZPkgpxIupr0PYBt02V3cOi4nD0NPWG7RYYwQ?e=NqY5xb
    
 
 # Licencia de Licencias Creative Commons implementada 
