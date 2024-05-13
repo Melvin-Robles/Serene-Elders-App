@@ -14,11 +14,17 @@ import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "../../firebase-config";
 import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from '@react-navigation/native';
+
 
 
 const { width } = Dimensions.get("window");
 
 function SigIn() {
+
+  const navigation = useNavigation();
+
+
   const [userName, setUsername] = useState("");
   const [surname, setSurName] = useState("");
   const [password, setPassword] = useState("");
@@ -61,7 +67,7 @@ function SigIn() {
               Alert.alert("Error al obtener datos del usuario: " + error.message);
             }
 
-            navigation.navigate("home");
+            navigation.navigate('components/home')
             setIsLoading(false);
           })
           .catch((error) => {

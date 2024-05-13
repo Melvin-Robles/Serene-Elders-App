@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Text, View, FlatList, TouchableOpacity, Image} from 'react-native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Link } from "expo-router";
+import { useNavigation } from '@react-navigation/native';
+
 
 
 
@@ -10,6 +11,8 @@ const Home = () => {
 
     const [name, setName] = useState('');
     const [surname, setSurname] = useState('');
+    const navigation = useNavigation();
+
 
 
     const getLocalUser = async () => {
@@ -66,7 +69,7 @@ const Home = () => {
         </TouchableOpacity>
         {menuVisible && (
           <View style={{ position: 'absolute', top: 30, right: 10,  zIndex: 1}}>
-            <TouchableOpacity onPress={() => navigation.navigate('TusCitasScreen')} style={{ backgroundColor: '#1499C3', borderRadius: 5, marginTop: 5, flexDirection: 'row', alignItems: 'center', padding: 10, paddingLeft:25 }}>
+            <TouchableOpacity onPress={() => navigation.navigate('components/TusCitasScreen')} style={{ backgroundColor: '#1499C3', borderRadius: 5, marginTop: 5, flexDirection: 'row', alignItems: 'center', padding: 10, paddingLeft:25 }}>
               <Image source={require('../../assets/Calendar.png')} style={{ width: 25, height: 25 }} />
               <Text  style={{ color: 'white' }}> Tus citas</Text>
             </TouchableOpacity>
@@ -78,11 +81,11 @@ const Home = () => {
               <Image source={require('../../assets/doctor.png')} style={{ width: 25, height: 25 }} />
               <Text style={{ color: 'white' }}> Doctores</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate('perfil')}  style={{ backgroundColor: '#A01C34', borderRadius: 5, marginTop: 5, flexDirection: 'row', alignItems: 'center', padding: 10, paddingLeft:25}}>
+            <TouchableOpacity onPress={() => navigation.navigate('components/perfil')}  style={{ backgroundColor: '#A01C34', borderRadius: 5, marginTop: 5, flexDirection: 'row', alignItems: 'center', padding: 10, paddingLeft:25}}>
                 <Image source={require('../../assets/user.png')} style={{ width: 25, height: 25 }} />
                 <Text style={{ color: 'white' }}> Mi perfil</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={{backgroundColor: '#DF4D0E', borderRadius: 5, marginTop: 5, flexDirection: 'row', alignItems: 'center', padding: 10, paddingLeft:35 }}>
+              <TouchableOpacity onPress={() => navigation.navigate('components/login')} style={{backgroundColor: '#DF4D0E', borderRadius: 5, marginTop: 5, flexDirection: 'row', alignItems: 'center', padding: 10, paddingLeft:35 }}>
                 <Image source={require('../../assets/salir.png')} style={{ width: 25, height: 25 }} />
                 <Text style={{ color: 'white' }}> Salir</Text>
               </TouchableOpacity>
@@ -104,7 +107,7 @@ const Home = () => {
         <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{'\n'}Tus próximas citas:</Text>
         <View style={{ marginTop: 10 }}>
           <View style={{ borderWidth: 1, borderColor: 'black', padding: 10, borderRadius: 5, borderStyle: 'dashed'  }}>
-            <TouchableOpacity  onPress={() => navigation.navigate('AgregarCitaForm')}  style={{ backgroundColor: '#e3f6fd', position: 'absolute', top: 5, right: 5, borderRadius: 2, padding: 5}}>
+            <TouchableOpacity  onPress={() => navigation.navigate('components/AgregarCitaForm')}  style={{ backgroundColor: '#e3f6fd', position: 'absolute', top: 5, right: 5, borderRadius: 2, padding: 5}}>
             <Text style={{ color: 'black', textAlign: 'center' }}>Agregar nueva cita +</Text>
             </TouchableOpacity>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
