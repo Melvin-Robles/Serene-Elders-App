@@ -6,6 +6,12 @@ import LottieView from "lottie-react-native";
 import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { useNavigation } from "@react-navigation/native";
+import SigIn from './components/signIn';
+import Login from './components/login'
+import Home from "./components/home";
 
 
 const { width } = Dimensions.get("window");
@@ -165,6 +171,21 @@ const getUserInfo = async (token) => {
   );
 };
 
+const Stack = createNativeStackNavigator();
+
+export default function App() {
+  return (
+    <NavigationContainer independent={true}>
+      <Stack.Navigator initialRouteName="LoginComponent">
+        <Stack.Screen name="LoginComponent" component={LoginComponent} options={{ headerShown: false }} />
+        <Stack.Screen name="Registrate!" component={SigIn} />
+        <Stack.Screen name="Inicia Sesion!" component={Login} />
+        <Stack.Screen name="Home" component={Home} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -227,4 +248,3 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LoginComponent;

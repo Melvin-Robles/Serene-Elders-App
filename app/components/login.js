@@ -12,12 +12,7 @@ import {
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "../../firebase-config";
-
-import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { useNavigation } from "@react-navigation/native";
 import { getFirestore, doc, getDoc  } from "firebase/firestore";
-import Home from "./home";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
@@ -25,6 +20,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const { width } = Dimensions.get("window");
 
 const Login = () => {
+
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
 
@@ -32,7 +28,6 @@ const Login = () => {
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
-  const navigation = useNavigation();
 
   const handleSignIn = () => {
     setIsLoading(true);
@@ -56,7 +51,7 @@ const Login = () => {
           Alert.alert("Error al obtener datos del usuario: " + error.message);
         }
   
-        navigation.navigate('Home');
+        navigation.navigate('home');
         setIsLoading(false);
       })
       .catch(error => {
@@ -120,18 +115,7 @@ const Login = () => {
   );
 };
 
-const Stack = createNativeStackNavigator();
 
-export default function App() {
-  return (
-    <NavigationContainer independent={true}>
-      <Stack.Navigator initialRouteName="logIn">
-        <Stack.Screen name="Inicia Sesion!" component={Login} />
-        <Stack.Screen name="Home" component={Home} />
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
-}
 
 const styles = StyleSheet.create({
   container: {
@@ -191,3 +175,4 @@ const styles = StyleSheet.create({
   },
 });
 
+export default Login

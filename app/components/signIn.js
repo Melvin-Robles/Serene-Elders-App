@@ -12,12 +12,7 @@ import {
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "../../firebase-config";
-
-import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { useNavigation } from "@react-navigation/native";
 import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
-import Home from "./home";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
@@ -34,7 +29,6 @@ function SigIn() {
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
-  const navigation = useNavigation();
 
   const handleCreateAccount = () => {
     setIsLoading(true);
@@ -67,7 +61,7 @@ function SigIn() {
               Alert.alert("Error al obtener datos del usuario: " + error.message);
             }
 
-            navigation.navigate("Home");
+            navigation.navigate("home");
             setIsLoading(false);
           })
           .catch((error) => {
@@ -165,18 +159,6 @@ function SigIn() {
   );
 }
 
-const Stack = createNativeStackNavigator();
-
-export default function App() {
-  return (
-    <NavigationContainer independent={true}>
-      <Stack.Navigator initialRouteName="sigIn">
-        <Stack.Screen name="Registrate!" component={SigIn} />
-        <Stack.Screen name="Home" component={Home} />
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
-}
 
 const styles = StyleSheet.create({
   container: {
@@ -235,3 +217,5 @@ const styles = StyleSheet.create({
     padding: 10,
   },
 });
+
+export default SigIn

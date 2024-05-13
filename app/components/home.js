@@ -66,15 +66,9 @@ const Home = () => {
         </TouchableOpacity>
         {menuVisible && (
           <View style={{ position: 'absolute', top: 30, right: 10,  zIndex: 1}}>
-            <TouchableOpacity  style={{ backgroundColor: '#1499C3', borderRadius: 5, marginTop: 5, flexDirection: 'row', alignItems: 'center', padding: 10, paddingLeft:25 }}>
+            <TouchableOpacity onPress={() => navigation.navigate('TusCitasScreen')} style={{ backgroundColor: '#1499C3', borderRadius: 5, marginTop: 5, flexDirection: 'row', alignItems: 'center', padding: 10, paddingLeft:25 }}>
               <Image source={require('../../assets/Calendar.png')} style={{ width: 25, height: 25 }} />
-              <Link
-          href="components/TusCitasScreen"
-
-          >
-
               <Text  style={{ color: 'white' }}> Tus citas</Text>
-          </Link>
             </TouchableOpacity>
             <TouchableOpacity style={{backgroundColor: '#8D16AB', borderRadius: 5, marginTop: 5, flexDirection: 'row', alignItems: 'center', padding: 10, paddingLeft:25 }}>
               <Image source={require('../../assets/Paciente.png')} style={{ width: 25, height: 25 }} />
@@ -84,7 +78,7 @@ const Home = () => {
               <Image source={require('../../assets/doctor.png')} style={{ width: 25, height: 25 }} />
               <Text style={{ color: 'white' }}> Doctores</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={{ backgroundColor: '#A01C34', borderRadius: 5, marginTop: 5, flexDirection: 'row', alignItems: 'center', padding: 10, paddingLeft:25}}>
+            <TouchableOpacity onPress={() => navigation.navigate('perfil')}  style={{ backgroundColor: '#A01C34', borderRadius: 5, marginTop: 5, flexDirection: 'row', alignItems: 'center', padding: 10, paddingLeft:25}}>
                 <Image source={require('../../assets/user.png')} style={{ width: 25, height: 25 }} />
                 <Text style={{ color: 'white' }}> Mi perfil</Text>
               </TouchableOpacity>
@@ -110,7 +104,7 @@ const Home = () => {
         <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{'\n'}Tus próximas citas:</Text>
         <View style={{ marginTop: 10 }}>
           <View style={{ borderWidth: 1, borderColor: 'black', padding: 10, borderRadius: 5, borderStyle: 'dashed'  }}>
-            <TouchableOpacity style={{ backgroundColor: '#e3f6fd', position: 'absolute', top: 5, right: 5, borderRadius: 2, padding: 5}}>
+            <TouchableOpacity  onPress={() => navigation.navigate('AgregarCitaForm')}  style={{ backgroundColor: '#e3f6fd', position: 'absolute', top: 5, right: 5, borderRadius: 2, padding: 5}}>
             <Text style={{ color: 'black', textAlign: 'center' }}>Agregar nueva cita +</Text>
             </TouchableOpacity>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
