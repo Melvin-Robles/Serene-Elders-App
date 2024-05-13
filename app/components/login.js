@@ -14,12 +14,15 @@ import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "../../firebase-config";
 import { getFirestore, doc, getDoc  } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from '@react-navigation/native';
 
 
 
 const { width } = Dimensions.get("window");
 
 const Login = () => {
+
+  const navigation = useNavigation();
 
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
@@ -30,6 +33,8 @@ const Login = () => {
   const auth = getAuth(app);
 
   const handleSignIn = () => {
+        
+
     setIsLoading(true);
     signInWithEmailAndPassword(auth, email, password)
       .then(async (userCredential) => { 
@@ -45,13 +50,12 @@ const Login = () => {
             console.log("Datos del usuario:", docSnap.data());
             const userInfo = await docSnap.data()
             await AsyncStorage.setItem("@userInfo",  JSON.stringify(userInfo));
-
           } 
         } catch (error) {
           Alert.alert("Error al obtener datos del usuario: " + error.message);
         }
-  
-        navigation.navigate('home');
+        
+        navigation.navigate('components/home')
         setIsLoading(false);
       })
       .catch(error => {
