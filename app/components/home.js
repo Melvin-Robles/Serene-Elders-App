@@ -2,25 +2,40 @@ import React, { useState, useEffect } from 'react';
 import { Text, View, FlatList, TouchableOpacity, Image} from 'react-native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from '@react-navigation/native';
-
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
 
 
 const Home = () => {
-    const [menuVisible, setMenuVisible] = useState(false);
+  const [menuVisible, setMenuVisible] = useState(false);
+  const auth = getAuth();
 
     const [name, setName] = useState('');
     const [surname, setSurname] = useState('');
+    const [rol, setRol] = useState('');
     const navigation = useNavigation();
 
+    const [user, setUser] = useState(null);
 
+    useEffect(() => {
+      const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+        if (currentUser) {
+          AsyncStorage.setItem("@userLogged",  JSON.stringify(currentUser));
+          
+        } 
+      });
+  
+      return () => unsubscribe();
+    }, []);
 
     const getLocalUser = async () => {
       const data = await AsyncStorage.getItem("@userInfo");
       const dataParsed =  JSON.parse(data)
+      console.log(dataParsed);
       if (dataParsed) {
         setName(dataParsed.name);      
         setSurname(dataParsed.surname); 
+        setRol(dataParsed.rol); 
       }
     };
 
@@ -94,10 +109,10 @@ const Home = () => {
       </View>
 
       <Text style={{ fontSize: 20, fontWeight: 'bold', marginTop: 20,  fontWeight: 'light'}}>
-        Bienvenido de nuevo
+        Bienvenido de nuevo 
       </Text>
       <Text style={{ fontSize: 40, fontWeight: 'bold', marginTop: 5 }}>
-      <Text>{name} {surname}</Text>
+      <Text>{rol == 'DOCTOR' ? 'Dr.' : 'Paciente'} {name} {surname}</Text>
       </Text>
       <Text style={{ fontSize: 16, fontWeight: 'bold', marginTop: 5,  fontWeight: 'light' }}>
         ¿Cómo podemos ayudarte ahora?
