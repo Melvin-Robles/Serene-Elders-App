@@ -1,8 +1,14 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform  } from 'react-native';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { getFirestore, collection, query, where, getDocs } from 'firebase/firestore';
+import RNPickerSelect from 'react-native-picker-select';
+
+
 
 const AgregarCitaForm = ({ onCancelar, onAgregar }) => {
-  const [nombrePaciente, setNombrePaciente] = useState('');
+  const [patientsData, setPatientsData] = useState([]);
+  const [selectedPatient, setSelectedPatient] = useState([]);
   const [fechaCita, setFechaCita] = useState('');
   const [horaCita, setHoraCita] = useState('');
   const [razonCita, setRazonCita] = useState('');
@@ -10,14 +16,14 @@ const AgregarCitaForm = ({ onCancelar, onAgregar }) => {
 
   const handleAgregar = () => {
     // Validar datos antes de agregar
-    if (!nombrePaciente || !fechaCita || !horaCita || !razonCita) {
+    if (!selectedPatient || !fechaCita || !horaCita || !razonCita) {
       alert('Por favor, complete todos los campos obligatorios.');
       return;
     }
     
     // Enviar datos a la función de agregar
     onAgregar({
-      nombrePaciente,
+      selectedPatient,
       fechaCita,
       horaCita,
       razonCita,
@@ -25,16 +31,74 @@ const AgregarCitaForm = ({ onCancelar, onAgregar }) => {
     });
   };
 
+
+  /* Formulario */
+
+  const [date, setDate] = useState(new Date());
+  const [time, setTime] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
+
+  const onChangeDate = (event, selectedDate) => {
+    const currentDate = selectedDate || date;
+    setShowDatePicker(Platform.OS === 'ios');
+    setDate(currentDate);
+  };
+
+  const onChangeTime = (event, selectedTime) => {
+    const currentTime = selectedTime || time;
+    setShowTimePicker(Platform.OS === 'ios');
+    setTime(currentTime);
+  };
+
+  /* Peticiones */
+
+  const fetchPatients = async () => {
+    const db = getFirestore();
+    const auth = getAuth();
+    const currentUser = auth.currentUser;
+    const currentUserId = currentUser ? currentUser.uid : null;
+  
+    const q = query(collection(db, "users"), where("rol", "==", "PATIENT"));
+    const querySnapshot = await getDocs(q);
+    const patients = [];
+    querySnapshot.forEach((doc) => {
+      if(doc.id !== currentUserId) {
+        patients.push({ id: doc.id, ...doc.data() });
+      }
+    });
+    return patients;
+  };
+
+  /* Querys */
+
+
+
+  useEffect(() => {
+    const getPatients = async () => {
+      const patients = await fetchPatients();
+      setPatientsData(patients);
+    };
+
+    getPatients();
+  }, []);
+
   return (
     <View style={styles.modalContainer}>
       <Text style={styles.formTitle}>Agregar Cita</Text>
       <View style={styles.inputContainer}>
-        <Text>Nombre del paciente:</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Nombre del paciente"
-          value={nombrePaciente}
-          onChangeText={setNombrePaciente}
+      <Text> Paciente:</Text>
+        <RNPickerSelect
+          onValueChange={(value) => setSelectedPatient(value)}
+          items={patientsData.map(patient => ({
+            label: patient.name + " " + patient.surname, 
+            value: patient.id, 
+          }))}
+          style={pickerSelectStyles}
+          placeholder={{
+            label: 'Selecciona un paciente...',
+            value: null,
+          }}
         />
       </View>
       <View style={styles.inputContainer}>
@@ -135,6 +199,21 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
+
+const pickerSelectStyles = StyleSheet.create({
+
+  inputAndroid: {
+    fontSize: 16,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderWidth: 0.5,
+    borderColor: 'purple',
+    borderRadius: 8,
+    color: 'black',
+    paddingRight: 30, 
+  },
+});
+
 
 export default AgregarCitaForm;
 

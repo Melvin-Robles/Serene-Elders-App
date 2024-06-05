@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
 import AgregarCitaForm from './AgregarCitaForm';
 
+
 const TusCitasScreen = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -47,7 +48,7 @@ const TusCitasScreen = () => {
               <Text style={styles.pacienteText}>{cita.paciente}</Text>
               <Text style={styles.horaText}>{cita.hora}</Text>
             </View>
-            <Text style={styles.linkText}>Editar | Eliminar</Text>
+            <Text style={styles.linkText}>Eliminar</Text>
           </View>
         ))}
       </View>
@@ -63,7 +64,7 @@ const TusCitasScreen = () => {
               <Text style={styles.pacienteText}>{cita.paciente}</Text>
               <Text style={styles.horaText}>{cita.hora}</Text>
             </View>
-            <Text style={styles.linkText}>Editar | Eliminar</Text>
+            <Text style={styles.linkText}> Eliminar</Text>
           </View>
         ))}
       </View>
