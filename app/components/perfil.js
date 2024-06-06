@@ -9,12 +9,10 @@ const Perfil = () => {
   const [especialidad, setEspecialidad] = useState('');
 
   const guardarPerfil = () => {
-    // Aquí puedes implementar la lógica para guardar los datos del perfil
     console.log('Perfil guardado:', { nombre, apellido, email, telefono, especialidad });
   };
 
   const modificarPerfil = () => {
-    // Aquí puedes implementar la lógica para modificar los datos del perfil
     console.log('Perfil modificado:', { nombre, apellido, email, telefono, especialidad });
   };
 
@@ -103,4 +101,3 @@ const styles = StyleSheet.create({
 });
 
 export default Perfil;
-

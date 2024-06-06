@@ -91,9 +91,30 @@ const Home = () => {
           fetchAppointments();
         }, []);
         const renderCitas = ({ item }) => (
-          <View style={{ flex: 1, flexDirection: 'column', marginBottom: 10, alignItems: 'center' }}>
-            <Text style={{ fontWeight: '500' }}>{item.patientName}</Text>
-            <Text>{item.razonCita} {item.fechaCita}</Text>
+          <View style={{
+            flex: 1,
+            flexDirection: 'column',
+            marginBottom: 15,
+            alignItems: 'center',
+            padding: 15,
+            borderRadius: 10,
+            backgroundColor: '#fff',
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.3,
+            shadowRadius: 5,
+            elevation: 5,
+          }}>
+            <Text style={{
+              fontWeight: 'bold',
+              fontSize: 18,
+              color: '#333',
+              marginBottom: 5,
+            }}>{item.patientName}</Text>
+            <Text style={{
+              fontSize: 16,
+              color: '#666',
+            }}>{item.razonCita} - {item.fechaCita}</Text>
           </View>
         );
 
@@ -190,9 +211,7 @@ const Home = () => {
             <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{'\n'}Tus próximas citas:</Text>
             <View style={{ marginTop: 10 }}>
               <View style={{ borderWidth: 1, borderColor: 'black', padding: 10, borderRadius: 5, borderStyle: 'dashed'  }}>
-                <TouchableOpacity  onPress={() => navigation.navigate('components/AgregarCitaForm')}  style={{ backgroundColor: '#e3f6fd', position: 'absolute', top: 5, right: 5, borderRadius: 2, padding: 5}}>
-                <Text style={{ color: 'black', textAlign: 'center' }}>Agregar nueva cita +</Text>
-                </TouchableOpacity>
+                
             <View>
             <FlatList
           data={appointments}
@@ -203,7 +222,7 @@ const Home = () => {
             </View>
                   
     
-                <TouchableOpacity style={{ backgroundColor: '#2D14C3', padding: 10, borderRadius: 5, marginTop: 10 }}>
+                <TouchableOpacity  onPress={() => navigation.navigate('components/TusCitasScreen')} style={{ backgroundColor: '#2D14C3', padding: 10, borderRadius: 5, marginTop: 10 }}>
                 <Text style={{ color: 'white', textAlign: 'center' }}>Ver Todas mis citas</Text>
                 </TouchableOpacity>
               </View>
