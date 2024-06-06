@@ -1,9 +1,20 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
 import AgregarCitaForm from './AgregarCitaForm';
+import { getAuth } from 'firebase/auth';
+import { getFirestore, doc, collection, addDoc, getDoc } from 'firebase/firestore'; 
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from '@react-navigation/native';
+
+
 
 
 const TusCitasScreen = () => {
+
+  const db = getFirestore();
+const auth = getAuth();
+const navigation = useNavigation();
+
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   // Datos de ejemplo
@@ -22,9 +33,47 @@ const TusCitasScreen = () => {
   };
 
   const agregarCita = (nuevaCita) => {
-    console.log('Nueva cita:', nuevaCita);
-    // Aquí puedes implementar la lógica para agregar la nueva cita a tus datos
-    // Por ahora, solo lo mostramos en la consola
+    
+    addAppointment(nuevaCita);
+  };
+
+
+  const addAppointment = async (newAppointment) => {
+    const { comentario, fechaCita, razonCita, selectedPatient } = newAppointment;
+  
+    try {
+      // Obtener la información del usuario logueado desde AsyncStorage
+    const userInfo = await AsyncStorage.getItem('@userLogged');
+    const user = userInfo ? JSON.parse(userInfo) : null;
+
+    if (!user || !user.uid) {
+      throw new Error('User information is not available');
+    }
+
+    const doctorId = user.uid;
+
+
+    // Referencia al documento del paciente en la colección "users"
+    const userDocRef = doc(db, 'users', selectedPatient);
+    const appointmentsColRef = collection(userDocRef, 'appointments');
+    const patientDocSnap = await getDoc(userDocRef);
+
+    const patientName = patientDocSnap.data().name;
+    
+    // Agregar nueva cita a la subcolección "appointments"
+    await addDoc(appointmentsColRef, {
+      comentario,
+      fechaCita,
+      razonCita,
+      doctorId,
+      patientName
+    });
+
+    
+    navigation.goBack()
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
 
   return (

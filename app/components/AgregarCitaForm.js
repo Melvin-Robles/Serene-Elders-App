@@ -10,13 +10,12 @@ const AgregarCitaForm = ({ onCancelar, onAgregar }) => {
   const [patientsData, setPatientsData] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState([]);
   const [fechaCita, setFechaCita] = useState('');
-  const [horaCita, setHoraCita] = useState('');
   const [razonCita, setRazonCita] = useState('');
   const [comentario, setComentario] = useState('');
 
   const handleAgregar = () => {
     // Validar datos antes de agregar
-    if (!selectedPatient || !fechaCita || !horaCita || !razonCita) {
+    if (!selectedPatient || !fechaCita || !razonCita) {
       alert('Por favor, complete todos los campos obligatorios.');
       return;
     }
@@ -25,7 +24,6 @@ const AgregarCitaForm = ({ onCancelar, onAgregar }) => {
     onAgregar({
       selectedPatient,
       fechaCita,
-      horaCita,
       razonCita,
       comentario
     });
@@ -49,6 +47,19 @@ const AgregarCitaForm = ({ onCancelar, onAgregar }) => {
     const currentTime = selectedTime || time;
     setShowTimePicker(Platform.OS === 'ios');
     setTime(currentTime);
+  };
+
+
+  const handleDateChange = (text) => {
+    let newText = text.replace(/[^0-9]/g, '');
+
+    if (newText.length > 2 && newText.length <= 4) {
+      newText = newText.slice(0, 2) + '/' + newText.slice(2);
+    } else if (newText.length > 4) {
+      newText = newText.slice(0, 2) + '/' + newText.slice(2, 4) + '/' + newText.slice(4, 8);
+    }
+
+    setFechaCita(newText.slice(0, 10));
   };
 
   /* Peticiones */
@@ -101,24 +112,15 @@ const AgregarCitaForm = ({ onCancelar, onAgregar }) => {
           }}
         />
       </View>
-      <View style={styles.inputContainer}>
-        <Text>Fecha de próxima cita:</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Fecha de próxima cita"
-          value={fechaCita}
-          onChangeText={setFechaCita}
-        />
-      </View>
-      <View style={styles.inputContainer}>
-        <Text>Hora de la cita:</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Hora de la cita"
-          value={horaCita}
-          onChangeText={setHoraCita}
-        />
-      </View>
+      <View style={styles.container}>
+      <TextInput
+        style={styles.input}
+        placeholder="Fecha de próxima cita (DD/MM/YYYY)"
+        value={fechaCita}
+        onChangeText={handleDateChange}
+        keyboardType="numeric" // Asegura que solo se muestre el teclado numérico
+      />
+    </View>
       <View style={styles.inputContainer}>
         <Text>Razón de la cita:</Text>
         <TextInput
