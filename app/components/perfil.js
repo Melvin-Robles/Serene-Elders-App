@@ -5,17 +5,13 @@ const Perfil = () => {
   const [nombre, setNombre] = useState('');
   const [apellido, setApellido] = useState('');
   const [email, setEmail] = useState('');
-  const [telefono, setTelefono] = useState('');
-  const [especialidad, setEspecialidad] = useState('');
 
   const guardarPerfil = () => {
-    // Aquí puedes implementar la lógica para guardar los datos del perfil
-    console.log('Perfil guardado:', { nombre, apellido, email, telefono, especialidad });
+    console.log('Perfil guardado:', { nombre, apellido, email });
   };
 
   const modificarPerfil = () => {
-    // Aquí puedes implementar la lógica para modificar los datos del perfil
-    console.log('Perfil modificado:', { nombre, apellido, email, telefono, especialidad });
+    console.log('Perfil modificado:', { nombre, apellido, email });
   };
 
   return (
@@ -41,21 +37,6 @@ const Perfil = () => {
         value={email}
         placeholder="Ingrese su correo electrónico"
         keyboardType="email-address"
-      />
-      <Text style={styles.label}>Teléfono:</Text>
-      <TextInput
-        style={styles.input}
-        onChangeText={setTelefono}
-        value={telefono}
-        placeholder="Ingrese su número de teléfono"
-        keyboardType="phone-pad"
-      />
-      <Text style={styles.label}>Especialidad en:</Text>
-      <TextInput
-        style={styles.input}
-        onChangeText={setEspecialidad}
-        value={especialidad}
-        placeholder="Ingrese su especialidad"
       />
       <TouchableOpacity
         style={styles.button}
@@ -103,4 +84,3 @@ const styles = StyleSheet.create({
 });
 
 export default Perfil;
-
