@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ImageBackground,
   Dimensions,
@@ -36,6 +36,19 @@ function SigIn() {
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
 
+
+  useEffect(() => {
+    const clearAsyncStorage = async () => {
+      try {
+        await AsyncStorage.clear();
+      } catch (error) {
+        console.error('Error clearing AsyncStorage:', error);
+      }
+    };
+
+    clearAsyncStorage();
+  }, []);
+
   const handleCreateAccount = () => {
     setIsLoading(true);
     createUserWithEmailAndPassword(auth, email, password)
@@ -59,7 +72,6 @@ function SigIn() {
               const docSnap = await getDoc(userRef);
               if (docSnap.exists()) {
                 const userInfo = await docSnap.data()
-                console.log(docSnap.data(), "docSnap");
                 await AsyncStorage.setItem("@userInfo",  JSON.stringify(userInfo));
     
               } 
@@ -78,7 +90,6 @@ function SigIn() {
           });
       })
       .catch((error) => {
-        console.log(error);
         setIsLoading(false);
         Alert.alert(error.message);
       });

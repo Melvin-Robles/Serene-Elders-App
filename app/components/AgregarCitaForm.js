@@ -1,60 +1,126 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform  } from 'react-native';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { getFirestore, collection, query, where, getDocs } from 'firebase/firestore';
+import RNPickerSelect from 'react-native-picker-select';
+
+
 
 const AgregarCitaForm = ({ onCancelar, onAgregar }) => {
-  const [nombrePaciente, setNombrePaciente] = useState('');
+  const [patientsData, setPatientsData] = useState([]);
+  const [selectedPatient, setSelectedPatient] = useState([]);
   const [fechaCita, setFechaCita] = useState('');
-  const [horaCita, setHoraCita] = useState('');
   const [razonCita, setRazonCita] = useState('');
   const [comentario, setComentario] = useState('');
 
   const handleAgregar = () => {
     // Validar datos antes de agregar
-    if (!nombrePaciente || !fechaCita || !horaCita || !razonCita) {
+    if (!selectedPatient || !fechaCita || !razonCita) {
       alert('Por favor, complete todos los campos obligatorios.');
       return;
     }
     
     // Enviar datos a la función de agregar
     onAgregar({
-      nombrePaciente,
+      selectedPatient,
       fechaCita,
-      horaCita,
       razonCita,
       comentario
     });
   };
 
+
+  /* Formulario */
+
+  const [date, setDate] = useState(new Date());
+  const [time, setTime] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
+
+  const onChangeDate = (event, selectedDate) => {
+    const currentDate = selectedDate || date;
+    setShowDatePicker(Platform.OS === 'ios');
+    setDate(currentDate);
+  };
+
+  const onChangeTime = (event, selectedTime) => {
+    const currentTime = selectedTime || time;
+    setShowTimePicker(Platform.OS === 'ios');
+    setTime(currentTime);
+  };
+
+
+  const handleDateChange = (text) => {
+    let newText = text.replace(/[^0-9]/g, '');
+
+    if (newText.length > 2 && newText.length <= 4) {
+      newText = newText.slice(0, 2) + '/' + newText.slice(2);
+    } else if (newText.length > 4) {
+      newText = newText.slice(0, 2) + '/' + newText.slice(2, 4) + '/' + newText.slice(4, 8);
+    }
+
+    setFechaCita(newText.slice(0, 10));
+  };
+
+  /* Peticiones */
+
+  const fetchPatients = async () => {
+    const db = getFirestore();
+    const auth = getAuth();
+    const currentUser = auth.currentUser;
+    const currentUserId = currentUser ? currentUser.uid : null;
+  
+    const q = query(collection(db, "users"), where("rol", "==", "PATIENT"));
+    const querySnapshot = await getDocs(q);
+    const patients = [];
+    querySnapshot.forEach((doc) => {
+      if(doc.id !== currentUserId) {
+        patients.push({ id: doc.id, ...doc.data() });
+      }
+    });
+    return patients;
+  };
+
+  /* Querys */
+
+
+
+  useEffect(() => {
+    const getPatients = async () => {
+      const patients = await fetchPatients();
+      setPatientsData(patients);
+    };
+
+    getPatients();
+  }, []);
+
   return (
     <View style={styles.modalContainer}>
       <Text style={styles.formTitle}>Agregar Cita</Text>
       <View style={styles.inputContainer}>
-        <Text>Nombre del paciente:</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Nombre del paciente"
-          value={nombrePaciente}
-          onChangeText={setNombrePaciente}
+      <Text> Paciente:</Text>
+        <RNPickerSelect
+          onValueChange={(value) => setSelectedPatient(value)}
+          items={patientsData.map(patient => ({
+            label: patient.name + " " + patient.surname, 
+            value: patient.id, 
+          }))}
+          style={pickerSelectStyles}
+          placeholder={{
+            label: 'Selecciona un paciente...',
+            value: null,
+          }}
         />
       </View>
-      <View style={styles.inputContainer}>
-        <Text>Fecha de próxima cita:</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Fecha de próxima cita"
-          value={fechaCita}
-          onChangeText={setFechaCita}
-        />
-      </View>
-      <View style={styles.inputContainer}>
-        <Text>Hora de la cita:</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Hora de la cita"
-          value={horaCita}
-          onChangeText={setHoraCita}
-        />
-      </View>
+      <View style={styles.container}>
+      <TextInput
+        style={styles.input}
+        placeholder="Fecha de próxima cita (DD/MM/YYYY)"
+        value={fechaCita}
+        onChangeText={handleDateChange}
+        keyboardType="numeric" // Asegura que solo se muestre el teclado numérico
+      />
+    </View>
       <View style={styles.inputContainer}>
         <Text>Razón de la cita:</Text>
         <TextInput
@@ -135,6 +201,21 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
+
+const pickerSelectStyles = StyleSheet.create({
+
+  inputAndroid: {
+    fontSize: 16,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderWidth: 0.5,
+    borderColor: 'purple',
+    borderRadius: 8,
+    color: 'black',
+    paddingRight: 30, 
+  },
+});
+
 
 export default AgregarCitaForm;
 

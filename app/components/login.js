@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
-import React, {  useState } from "react";
+import React, {  useState, useEffect } from "react";
 import {
   ImageBackground,
   Dimensions,
@@ -32,22 +32,32 @@ const Login = () => {
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
 
+  useEffect(() => {
+    const clearAsyncStorage = async () => {
+      try {
+        await AsyncStorage.clear();
+      } catch (error) {
+        console.error('Error clearing AsyncStorage:', error);
+      }
+    };
+
+    clearAsyncStorage(); 
+  }, []);
+
+
   const handleSignIn = () => {
         
 
     setIsLoading(true);
     signInWithEmailAndPassword(auth, email, password)
       .then(async (userCredential) => { 
-        console.log('Signed in!');
         const user = userCredential.user;
-        console.log(user);
   
         const db = getFirestore();
         const userRef = doc(db, "users", user.uid);
         try {
           const docSnap = await getDoc(userRef);
           if (docSnap.exists()) {
-            console.log("Datos del usuario:", docSnap.data());
             const userInfo = await docSnap.data()
             await AsyncStorage.setItem("@userInfo",  JSON.stringify(userInfo));
           } 

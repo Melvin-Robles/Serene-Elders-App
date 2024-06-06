@@ -1,27 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, FlatList, TouchableOpacity, Image} from 'react-native';
+import { Text, View, FlatList, TouchableOpacity, Image, ActivityIndicator} from 'react-native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from '@react-navigation/native';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { getFirestore, collectionGroup, collection, query, where, getDocs } from 'firebase/firestore';
 
 
 
 const Home = () => {
-  const [menuVisible, setMenuVisible] = useState(false);
   const auth = getAuth();
-
+  const navigation = useNavigation();
+  
+  const [menuVisible, setMenuVisible] = useState(false);
     const [name, setName] = useState('');
     const [surname, setSurname] = useState('');
     const [rol, setRol] = useState('');
-    const navigation = useNavigation();
-
-    const [user, setUser] = useState(null);
+    const [appointments, setAppointments] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
       const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
         if (currentUser) {
           AsyncStorage.setItem("@userLogged",  JSON.stringify(currentUser));
-          
         } 
       });
   
@@ -31,7 +31,6 @@ const Home = () => {
     const getLocalUser = async () => {
       const data = await AsyncStorage.getItem("@userInfo");
       const dataParsed =  JSON.parse(data)
-      console.log(dataParsed);
       if (dataParsed) {
         setName(dataParsed.name);      
         setSurname(dataParsed.surname); 
@@ -47,32 +46,98 @@ const Home = () => {
     const toggleMenu = () => {
         setMenuVisible(!menuVisible);
         };
+
+        /* Peticiones */
+
+        useEffect(() => {
+          setIsLoading(true);
+        
+          const fetchAppointments = async (retries = 3, delay = 1000) => {
+            const db = getFirestore();
+            try {
+              // Obtener la información del usuario logueado desde AsyncStorage
+              const userInfo = await AsyncStorage.getItem('@userLogged');
+              const user = userInfo ? JSON.parse(userInfo) : null;
+        
+              if (!user || !user.uid) {
+                throw new Error('User information is not available');
+              }
+        
+              const doctorId = user.uid;
+        
+              // Crear una consulta para obtener todos los documentos de la subcolección "appointments" con el doctorId especificado
+              const appointmentsQuery = query(collectionGroup(db, 'appointments'), where('doctorId', '==', doctorId));
+              const querySnapshot = await getDocs(appointmentsQuery);
+        
+              const appointmentsList = [];
+              querySnapshot.forEach((doc) => {
+                appointmentsList.push({ id: doc.id, ...doc.data() });
+              });
+        
+              setAppointments(appointmentsList);
+              setIsLoading(false);
+            } catch (error) {
+              console.error('Error obteniendo las citas: ', error);
+              if (retries > 0) {
+                console.log(`Reintentando... ${retries} veces restantes.`);
+                setTimeout(() => fetchAppointments(retries - 1, delay * 2), delay); // Aumenta el delay para el próximo intento
+              } else {
+                setIsLoading(false); // Asegúrate de detener el indicador de carga si ya no hay reintentos
+                // Considera mostrar algún mensaje al usuario indicando que no se pudo obtener la información después de varios intentos
+              }
+            }
+          };
+        
+          fetchAppointments();
+        }, []);
+        const renderCitas = ({ item }) => (
+          <View style={{ flex: 1, flexDirection: 'column', marginBottom: 10, alignItems: 'center' }}>
+            <Text style={{ fontWeight: '500' }}>{item.patientName}</Text>
+            <Text>{item.razonCita} {item.fechaCita}</Text>
+          </View>
+        );
+
+        const fetchPatients = async () => {
+          const db = getFirestore();
+          const auth = getAuth();
+          const currentUser = auth.currentUser;
+          const currentUserId = currentUser ? currentUser.uid : null;
+        
+          const q = query(collection(db, "users"), where("rol", "==", "PATIENT"));
+          const querySnapshot = await getDocs(q);
+          const patients = [];
+          querySnapshot.forEach((doc) => {
+            if(doc.id !== currentUserId) {
+              patients.push({ id: doc.id, ...doc.data() });
+            }
+          });
+          return patients;
+        };
+
+        /* Querys */
+
+        const [patientsData, setPatientsData] = useState([]);
+
+        useEffect(() => {
+          const getPatients = async () => {
+            const patients = await fetchPatients();
+            setPatientsData(patients);
+          };
+
+          getPatients();
+        }, []);
+
+
+        const renderItem = ({ item }) => (
+          <View style={{ flex: 1, flexDirection: 'row', marginBottom: 10, alignItems: 'center' }}>
+             <Image source={'../../assets/UserM.png'} style={{ width: 30, height: 30, marginRight: 10 }} />
+            <Text>{item.name} {item.surname}</Text>
+          </View>
+        );
   
-        const patientsData = [
-          { name: 'Ernesto Araujo', phone: '0000-0000', id: '#012345', gender: 'male' },
-          { name: 'Angel Abarca', phone: '0000-0000', id: '#067891', gender: 'male' },
-          { name: 'Lorena Parcas', phone: '0000-0000', id: '#048795', gender: 'female' },
-          { name: 'Daniela Pleitez', phone: '0000-0000', id: '#97248', gender: 'female' },
-      ];
 
       
-    const renderItem = ({ item }) => {
-        let imageSource = require('../../assets/UserM.png'); 
-        if (item.gender === 'female') {
-            imageSource = require('../../assets/UserF.png');
-        }
 
-        return (
-            <View style={{ flex: 1, flexDirection: 'row', marginBottom: 10, alignItems: 'center' }}>
-                <Image source={imageSource} style={{ width: 30, height: 30, marginRight: 10 }} />
-                <View style={{ flex: 1 }}>
-                    <Text>{item.name}</Text>
-                    <Text>{item.phone}</Text>
-                    <Text>{item.id}</Text>
-                </View>
-            </View>
-        );
-    };
 
       
   return (
@@ -118,53 +183,74 @@ const Home = () => {
         ¿Cómo podemos ayudarte ahora?
       </Text>
 
-    <View style={{ marginTop: 20 }}>
-        <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{'\n'}Tus próximas citas:</Text>
-        <View style={{ marginTop: 10 }}>
-          <View style={{ borderWidth: 1, borderColor: 'black', padding: 10, borderRadius: 5, borderStyle: 'dashed'  }}>
-            <TouchableOpacity  onPress={() => navigation.navigate('components/AgregarCitaForm')}  style={{ backgroundColor: '#e3f6fd', position: 'absolute', top: 5, right: 5, borderRadius: 2, padding: 5}}>
-            <Text style={{ color: 'black', textAlign: 'center' }}>Agregar nueva cita +</Text>
-            </TouchableOpacity>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Image source={require('../../assets/number-8.png')} style={{ width: 30, height: 30, marginRight: 10 }} />
-              <View>
-                <Text>{'\n'}Paciente: Laura Quintanilla</Text>
-                <Text>Hora: 08:00 am{'\n'}</Text>
+    
+
+    {rol == 'DOCTOR' ? (
+            <View style={{ marginTop: 20 }}>
+            <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{'\n'}Tus próximas citas:</Text>
+            <View style={{ marginTop: 10 }}>
+              <View style={{ borderWidth: 1, borderColor: 'black', padding: 10, borderRadius: 5, borderStyle: 'dashed'  }}>
+                <TouchableOpacity  onPress={() => navigation.navigate('components/AgregarCitaForm')}  style={{ backgroundColor: '#e3f6fd', position: 'absolute', top: 5, right: 5, borderRadius: 2, padding: 5}}>
+                <Text style={{ color: 'black', textAlign: 'center' }}>Agregar nueva cita +</Text>
+                </TouchableOpacity>
+            <View>
+            <FlatList
+          data={appointments}
+          renderItem={renderCitas}
+          keyExtractor={(item) => item.id}
+          numColumns={2}
+        />
+            </View>
+                  
+    
+                <TouchableOpacity style={{ backgroundColor: '#2D14C3', padding: 10, borderRadius: 5, marginTop: 10 }}>
+                <Text style={{ color: 'white', textAlign: 'center' }}>Ver Todas mis citas</Text>
+                </TouchableOpacity>
               </View>
             </View>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Image source={require('../../assets/number-12.png')} style={{ width: 30, height: 30, marginRight: 10 }} />
-              <View>
-                <Text>Paciente: Ernesto Araujo</Text>
-                <Text>Hora: 09:00 am</Text>
-              </View>
-            </View> 
-            <TouchableOpacity style={{ backgroundColor: '#2D14C3', padding: 10, borderRadius: 5, marginTop: 10 }}>
-            <Text style={{ color: 'white', textAlign: 'center' }}>Ver Todas mis citas</Text>
+        </View>
+            ) : (
+              <Text style={{ color: 'black', textAlign: 'center' }}>Mostrar citas del paciente</Text>
+            )}
+
+
+            
+    {rol == 'DOCTOR' ? (
+        <View style={{ marginTop: 20 }}>
+        <Text style={{ fontSize: 16, fontWeight: 'bold' }}>Pacientes:</Text>
+        <View style={{ marginTop: 20, flexDirection: 'row', flexWrap: 'wrap', borderWidth: 1, borderColor: 'black', padding: 10, borderRadius: 5, borderStyle: 'dashed' }}>
+            
+        {isLoading ? (
+      <ActivityIndicator size="large" color="#0000ff" />
+    ) : (
+<FlatList
+                data={patientsData}
+                renderItem={renderItem}
+                keyExtractor={(item) => item.id}
+                numColumns={2} 
+            />
+    )}
+            
+        </View>
+        <View style={{ flexDirection: 'row', marginTop: 10 }}>
+            <TouchableOpacity style={{ backgroundColor: '#008CBA', padding: 10, borderRadius: 5, flex: 1, marginLeft: 5 }}>
+                <Text style={{ color: 'white', textAlign: 'center' }}>Ver Todos mis pacientes</Text>
             </TouchableOpacity>
-          </View>
         </View>
     </View>
+            ) : (
+              <View style={{ marginTop: 20 }}>
+              <Text style={{ fontSize: 16, fontWeight: 'bold' }}>Doctores:</Text>
+              <View style={{ marginTop: 20, flexDirection: 'row', flexWrap: 'wrap', borderWidth: 1, borderColor: 'black', padding: 10, borderRadius: 5, borderStyle: 'dashed' }}>
+                  
 
-    <View style={{ marginTop: 20 }}>
-                <Text style={{ fontSize: 16, fontWeight: 'bold' }}>Pacientes:</Text>
-                <View style={{ marginTop: 20, flexDirection: 'row', flexWrap: 'wrap', borderWidth: 1, borderColor: 'black', padding: 10, borderRadius: 5, borderStyle: 'dashed' }}>
-                    <FlatList
-                        data={patientsData}
-                        renderItem={renderItem}
-                        keyExtractor={(item) => item.id}
-                        numColumns={2} 
-                    />
-                </View>
-                <View style={{ flexDirection: 'row', marginTop: 10 }}>
-                    <TouchableOpacity style={{ backgroundColor: '#2D14C3', padding: 10, borderRadius: 5, flex: 1, marginRight: 5 }}>
-                        <Text style={{ color: 'white', textAlign: 'center' }}>Agregar nuevo paciente</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={{ backgroundColor: '#008CBA', padding: 10, borderRadius: 5, flex: 1, marginLeft: 5 }}>
-                        <Text style={{ color: 'white', textAlign: 'center' }}>Ver Todos mis pacientes</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
+                  
+              </View>
+          </View>
+            )}
+
+
+
     </View>
     
   );
