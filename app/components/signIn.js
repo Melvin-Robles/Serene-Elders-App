@@ -61,7 +61,7 @@ function SigIn() {
           surname: surname,
           celphone: celphone,
           createdAt: new Date(),
-          rol: null,
+          rol: 'DOCTOR',
         })
           .then(async() => {
             Alert.alert("Usuario registrado");
