@@ -616,6 +616,8 @@ fetchDoctorUsers()
           </View>
           <View style={{ flexDirection: "row", marginTop: 10 }}>
             <TouchableOpacity
+                         onPress={() => navigation.navigate("components/Pacientes")}
+
               style={{
                 backgroundColor: "#008CBA",
                 padding: 10,
@@ -632,7 +634,7 @@ fetchDoctorUsers()
         </View>
       ) : (
         <View style={{ marginTop: 20 }}>
-          <Text style={{ fontSize: 16, fontWeight: "bold" }}>Dcotores:</Text>
+          <Text style={{ fontSize: 16, fontWeight: "bold" }}>Doctores:</Text>
           <View
             style={{
               marginTop: 20,
@@ -654,6 +656,7 @@ fetchDoctorUsers()
           </View>
           <View style={{ flexDirection: "row", marginTop: 10 }}>
             <TouchableOpacity
+            onPress={() => navigation.navigate("components/Doctores")}
               style={{
                 backgroundColor: "#008CBA",
                 padding: 10,
@@ -663,7 +666,7 @@ fetchDoctorUsers()
               }}
             >
               <Text style={{ color: "white", textAlign: "center" }}>
-                Ver Todos los pacientes
+                Ver Todos los Doctores
               </Text>
             </TouchableOpacity>
           </View>
