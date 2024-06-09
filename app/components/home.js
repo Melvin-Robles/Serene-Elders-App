@@ -178,7 +178,7 @@ const Home = () => {
               <Image source={require('../../assets/Paciente.png')} style={{ width: 25, height: 25 }} />
               <Text style={{ color: 'white' }}> Pacientes</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={{ backgroundColor: '#0A7461', borderRadius: 5, marginTop: 5, flexDirection: 'row', alignItems: 'center', padding: 10, paddingLeft:25 }}>
+            <TouchableOpacity onPress={() => navigation.navigate('components/Doctores')} style={{ backgroundColor: '#0A7461', borderRadius: 5, marginTop: 5, flexDirection: 'row', alignItems: 'center', padding: 10, paddingLeft:25 }}>
               <Image source={require('../../assets/doctor.png')} style={{ width: 25, height: 25 }} />
               <Text style={{ color: 'white' }}> Doctores</Text>
             </TouchableOpacity>
