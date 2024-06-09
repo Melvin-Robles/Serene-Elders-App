@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
     color: 'grey',
   },
   doctorContainer: {
-    marginBottom: 10,
+    margin: 30,
     flex: 1,
     flexDirection: 'column',
     padding:'10'
