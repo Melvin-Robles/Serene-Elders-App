@@ -592,7 +592,7 @@ fetchDoctorUsers()
 
       {rol == "DOCTOR" ? (
         <View style={{ marginTop: 20 }}>
-          <Text style={{ fontSize: 16, fontWeight: "bold" }}>Pacientesd:</Text>
+          <Text style={{ fontSize: 16, fontWeight: "bold" }}>Pacientes:</Text>
           <View
             style={{
               marginTop: 20,
