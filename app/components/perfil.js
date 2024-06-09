@@ -1,49 +1,60 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Text, View, TextInput, StyleSheet, Image } from 'react-native';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 
 const Perfil = () => {
-  const [nombre, setNombre] = useState('Alex');
-  const [apellido, setApellido] = useState('Siguenza');
-  const [email, setEmail] = useState('alexsiguenza@gmail.com');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [name, setName] = useState("");
+  const [surname, setSurname] = useState("");
+  const [rol, setRol] = useState("");
+
+
+  const getLocalUser = async () => {
+    const data = await AsyncStorage.getItem("@userInfo");
+    const dataParsed = JSON.parse(data);
+    if (dataParsed) {
+      setName(dataParsed.name);
+      setSurname(dataParsed.surname);
+      setRol(dataParsed.rol);
+      setEmail(dataParsed.email);
+      setPhone(dataParsed.celphone);
+    }
+  };
+
+  useEffect(() => {
+    getLocalUser();
+  }, []);
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Image source={require('../../assets/drs.png')} style={styles.profileImage} />
         <Text style={styles.greeting}>¡Hola!</Text>
-        <Text style={styles.name}>Dr. {nombre} {apellido}</Text>
-        <Text style={styles.subtitle}>Doctor/a</Text>
+        <Text style={styles.name}> {rol == "DOCTOR" ? "Dr." : "Paciente"} {name} {surname}</Text>
       </View>
       <View style={styles.formRow}>
         <View style={styles.formGroup}>
           <Text style={styles.label}>Nombre</Text>
-          <TextInput
-            style={styles.input}
-            onChangeText={setNombre}
-            value={nombre}
-            placeholder="Ingrese su nombre"
-          />
+          <Text style={{fontWeight:'bold'}}>{name}</Text>
+          
         </View>
         <View style={styles.formGroup}>
           <Text style={styles.label}>Apellido</Text>
-          <TextInput
-            style={styles.input}
-            onChangeText={setApellido}
-            value={apellido}
-            placeholder="Ingrese su apellido"
-          />
+          <Text style={{fontWeight:'bold'}}>{surname}</Text>
         </View>
       </View>
       <View style={styles.formGroup}>
         <Text style={styles.label}>Correo Electrónico</Text>
-        <TextInput
-          style={styles.input}
-          onChangeText={setEmail}
-          value={email}
-          placeholder="Ingrese su correo electrónico"
-          keyboardType="email-address"
-        />
+        <Text style={{fontWeight:'bold'}}>{email}</Text>
+        <Text style={{marginTop:'10'}}></Text>
+        <Text style={styles.label}>Celular</Text>
+        <Text style={{fontWeight:'bold'}}>{phone}</Text>
+        
+        
       </View>
+      
     </View>
   );
 };

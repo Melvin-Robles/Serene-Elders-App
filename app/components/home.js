@@ -398,7 +398,7 @@ fetchDoctorUsers()
               />
               <Text style={{ color: "white" }}> Tus citas</Text>
             </TouchableOpacity>
-            <TouchableOpacity
+            {rol == "DOCTOR" ? (<TouchableOpacity
              onPress={() => navigation.navigate("components/Pacientes")}
               style={{
                 backgroundColor: "#8D16AB",
@@ -415,8 +415,9 @@ fetchDoctorUsers()
                 style={{ width: 25, height: 25 }}
               />
               <Text style={{ color: "white" }}> Pacientes</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
+            </TouchableOpacity>) : ""} 
+            
+                  <TouchableOpacity
               onPress={() => navigation.navigate("components/Doctores")}
               style={{
                 backgroundColor: "#0A7461",
@@ -434,8 +435,9 @@ fetchDoctorUsers()
               />
               <Text style={{ color: "white" }}> Doctores</Text>
             </TouchableOpacity>
+ 
             <TouchableOpacity
-              onPress={() => navigation.navigate("components/perfil")}
+              onPress={() => navigation.navigate("components/Perfil")}
               style={{
                 backgroundColor: "#A01C34",
                 borderRadius: 5,
