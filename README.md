@@ -19,6 +19,8 @@
  - [Enlace a Word- Manual Tecnico] https://udbedu-my.sharepoint.com/:w:/g/personal/af231735_alumno_udb_edu_sv/EV4FwZIj7qZMk7hveMqGd74BgV9HpaBfpRDnAwm-3HDuiw?e=3J60gQ
 
  - [Enlace a Word - Manual de usuario] https://udbedu-my.sharepoint.com/:w:/g/personal/af231735_alumno_udb_edu_sv/EYU_MvpB-cZPkgpxIupr0PYBt02V3cOi4nD0NPWG7RYYwQ?e=NqY5xb
+
+ - [Defensa Final] https://youtu.be/eJ9cyCyGG4w
    
 
 # Licencia de Licencias Creative Commons implementada 
