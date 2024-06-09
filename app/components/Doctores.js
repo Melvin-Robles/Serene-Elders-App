@@ -1,13 +1,27 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, Image, TouchableOpacity, Modal } from 'react-native';
+import React,{ useState, useEffect } from 'react';
+import { StyleSheet, Text, View, ScrollView, Image, TouchableOpacity, Modal, FlatList } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import NuevoDoctorForm from './NuevoDoctor';
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import {
+  getFirestore,
+  collectionGroup,
+  collection,
+  query,
+  where,
+  getDocs,
+  doc,
+  getDoc,
+} from "firebase/firestore";
 
 
 const Doctores = () => {
     const [menuVisible, setMenuVisible] = useState(false);
     const navigation = useNavigation();
     const [showForm, setShowForm] = useState(false);
+    const [listDoctors, setListDoctors] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+
 
     const toggleMenu = () => {
     setMenuVisible(!menuVisible);};
@@ -22,6 +36,42 @@ const Doctores = () => {
         setModalVisible(false);
       };
 
+
+      useEffect(() => {
+        const fetchDoctorUsers = async () => {
+          setIsLoading(true);
+        
+          const db = getFirestore();
+          try {
+            const doctorUsersQuery = query(collection(db, 'users'), where('rol', '==', 'DOCTOR'));
+            const querySnapshot = await getDocs(doctorUsersQuery);
+        
+            const doctorUsersList = [];
+            querySnapshot.forEach((doc) => {
+              doctorUsersList.push({ id: doc.id, ...doc.data() });
+            });
+        
+            setIsLoading(false);
+            console.log(doctorUsersList);
+            setListDoctors(doctorUsersList);
+            return doctorUsersList;
+          } catch (error) {
+            console.error('Error fetching doctor users: ', error);
+            setIsLoading(false);
+            return [];
+          }
+        };
+        fetchDoctorUsers()
+          }, []);
+
+          const renderDoctors = ({ item }) => (
+<View style={styles.doctorContainer}>
+      <Text style={styles.doctorName}>{item.name}</Text>
+      <Text style={styles.doctorSpecialty}>{item.surname}</Text>
+      <Text style={styles.doctorStatus}>{item.email}</Text>
+      <Text>{item.celphone}</Text>
+    </View>
+          );
     
 
   return (
@@ -84,22 +134,11 @@ const Doctores = () => {
             <Image source={require('../../assets/green.png')} style={styles.Icon} />
             <Text style={styles.sectionHeader}>Disponibles</Text>
           </TouchableOpacity >
-          <TouchableOpacity style={styles.container3}> 
-            <Doctor name="Dra. Alejandra Portillo" specialty="Neurocirugía" status="Conectado" />
-            <Doctor name="Dr. Melvin Robles" specialty="Gastroenterología" status="Conectado" />
-            <Doctor name="Dr. Juan Valdez" specialty="Medico general" status="Conectado" />
-            <Doctor name="Dra. Carolina Marin" specialty="Medico general" status="Conectado" />
-          </TouchableOpacity>
-          </View>
-          <View style={styles.section}>
-          <TouchableOpacity style={{ marginTop: 5, flexDirection: 'row', marginBottom:10 }}>
-            <Image source={require('../../assets/red.png')} style={styles.Icon} />
-            <Text style={styles.sectionHeader}>Desconectados</Text>
-          </TouchableOpacity >
-          <TouchableOpacity style={styles.container3}> 
-            <Doctor name="Dra. Daniela Fuentes" specialty="Pediatra" status="Desconectado" />
-            <Doctor name="Dr. Alex Díaz" specialty="Ginecólogo" status="Desconectado" />
-          </TouchableOpacity>
+          <FlatList
+                data={listDoctors}
+                renderItem={renderDoctors}
+                keyExtractor={(item) => item.id}
+              />          
           </View>
         </ScrollView>
         </View>   
@@ -109,15 +148,6 @@ const Doctores = () => {
   );
 };
 
-const Doctor = ({ name, specialty, status }) => {
-  return (
-    <View style={styles.doctorContainer}>
-      <Text style={styles.doctorName}>{name}</Text>
-      <Text style={styles.doctorSpecialty}>{specialty}</Text>
-      <Text style={styles.doctorStatus}>{status}</Text>
-    </View>
-  );
-};
 
 const styles = StyleSheet.create({
   container: {
@@ -164,6 +194,8 @@ const styles = StyleSheet.create({
   },
   doctorContainer: {
     marginBottom: 10,
+    flex: 1,
+    flexDirection: 'column'
   },
   doctorName: {
     fontSize: 16,

@@ -7,9 +7,20 @@ import {
   Dimensions,
   TouchableOpacity,
   Button, TextInput, ScrollView, Alert,  StatusBar,
-  SafeAreaView,Image
+  SafeAreaView,Image, FlatList
 } from "react-native";
 import * as Font from "expo-font";
+import {
+  getFirestore,
+  collectionGroup,
+  collection,
+  query,
+  where,
+  getDocs,
+  doc,
+  getDoc,
+} from "firebase/firestore";
+
 
 /*import firebase from "../../database/firebase";
 import { QuerySnapshot } from "firebase/firestore";*/
@@ -20,6 +31,9 @@ import {ListItem, Avatar} from 'react-native-elements'
 const { width } = Dimensions.get("window");
 
 const pacientesComponent = () => {
+
+  const [listPatient, setLisPatient] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [fontsLoaded, setFontsLoaded] = useState(false);
 
   const users = [
@@ -138,7 +152,43 @@ const pacientesComponent = () => {
     });
 
   }, []);
+
 */
+
+useEffect(() => {
+  const fetchPatients = async () => {
+    setIsLoading(true);
+  
+    const db = getFirestore();
+    try {
+      const doctorUsersQuery = query(collection(db, 'users'), where('rol', '==', 'PATIENT'));
+      const querySnapshot = await getDocs(doctorUsersQuery);
+  
+      const doctorUsersList = [];
+      querySnapshot.forEach((doc) => {
+        doctorUsersList.push({ id: doc.id, ...doc.data() });
+      });
+  
+      setIsLoading(false);
+      setLisPatient(doctorUsersList);
+      return doctorUsersList;
+    } catch (error) {
+      console.error('Error fetching patient users: ', error);
+      setIsLoading(false);
+      return [];
+    }
+  };
+  fetchPatients()
+    }, []);
+
+    const renderPatient = ({ item }) => (
+<View style={styles.doctorContainer}>
+<Text style={styles.doctorName}>{item.name}</Text>
+<Text style={styles.doctorSpecialty}>{item.surname}</Text>
+<Text style={styles.doctorStatus}>{item.email}</Text>
+<Text>{item.celphone}</Text>
+</View>
+    );
   return (
     <View style={styles.contenedor}>
 
@@ -151,30 +201,11 @@ const pacientesComponent = () => {
         <TouchableOpacity style={styles.botonIngresar} >
           <Text style={styles.textoBoton}>Agregar nuevo paciente +</Text>
         </TouchableOpacity>
-
-        {         
-          users.map(user =>{
-            return (
-              <ListItem bottomDivider 
-                key={user.id}
-              >
-                <ListItem.Chevron />
-                <Avatar source={require('../../icons/avatar.png')}/>
-                <ListItem.Content>
-                  <ListItem.Title>
-                    {user.nombres} {user.apellidos} 
-                  </ListItem.Title>
-                  <ListItem.Subtitle>
-                  {user.correo}
-                  </ListItem.Subtitle>
-                  <ListItem.Subtitle>
-                  <TouchableOpacity  ><Text style={styles.verCitas}>Ver citas</Text></TouchableOpacity>
-                  </ListItem.Subtitle>
-                </ListItem.Content>
-              </ListItem>
-            )
-          })
-        }
+        <FlatList
+                data={listPatient}
+                renderItem={renderPatient}
+                keyExtractor={(item) => item.id}
+              />  
         
     </ScrollView>
   </View>
@@ -217,6 +248,24 @@ const styles = StyleSheet.create({
   verCitas:{
     fontSize: 17,
     color: 'grey',
+  },
+  doctorContainer: {
+    marginBottom: 10,
+    flex: 1,
+    flexDirection: 'column',
+    padding:'10'
+  },
+  doctorName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  doctorSpecialty: {
+    fontSize: 14,
+    color: '#666',
+  },
+  doctorStatus: {
+    fontSize: 14,
+    color: '#666',
   },
 });
 

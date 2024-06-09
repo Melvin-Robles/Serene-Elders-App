@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Modal, FlatList,  ActivityIndicator } from 'react-native';
 import AgregarCitaForm from './AgregarCitaForm';
-import { getAuth } from 'firebase/auth';
-import { getFirestore, doc, collection, addDoc, getDoc } from 'firebase/firestore'; 
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { getFirestore, doc, collection, collectionGroup, addDoc, getDoc, getDocs, query, where } from 'firebase/firestore'; 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from '@react-navigation/native';
 
@@ -14,19 +14,40 @@ const TusCitasScreen = () => {
   const db = getFirestore();
 const auth = getAuth();
 const navigation = useNavigation();
+const [name, setName] = useState('');
+const [surname, setSurname] = useState('');
+const [rol, setRol] = useState('');
+const [appointments, setAppointments] = useState([]);
+const [appointmentsUser, setAppointmentsUser] = useState([]);
+const [isLoading, setIsLoading] = useState(false);
+
 
   const [isModalVisible, setIsModalVisible] = useState(false);
 
-  // Datos de ejemplo
-  const proximasCitas = [
-    { paciente: "Juan Perez", hora: "10:00 AM" },
-    { paciente: "Maria Gomez", hora: "11:30 AM" },
-  ];
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        AsyncStorage.setItem("@userLogged",  JSON.stringify(currentUser));
+      } 
+    });
 
-  const citasRecientes = [
-    { paciente: "Carlos Ramirez", hora: "09:15 AM" },
-    { paciente: "Ana Martinez", hora: "01:45 PM" },
-  ];
+    return () => unsubscribe();
+  }, []);
+
+  const getLocalUser = async () => {
+    const data = await AsyncStorage.getItem("@userInfo");
+    const dataParsed =  JSON.parse(data)
+    if (dataParsed) {
+      setName(dataParsed.name);      
+      setSurname(dataParsed.surname); 
+      setRol(dataParsed.rol); 
+    }
+  };
+
+  useEffect(() => {
+    getLocalUser();
+  }, []);
+  
 
   const toggleModal = () => {
     setIsModalVisible(!isModalVisible);
@@ -42,7 +63,7 @@ const navigation = useNavigation();
     const { comentario, fechaCita, razonCita, selectedPatient } = newAppointment;
   
     try {
-      // Obtener la información del usuario logueado desde AsyncStorage
+      
     const userInfo = await AsyncStorage.getItem('@userLogged');
     const user = userInfo ? JSON.parse(userInfo) : null;
 
@@ -53,14 +74,14 @@ const navigation = useNavigation();
     const doctorId = user.uid;
 
 
-    // Referencia al documento del paciente en la colección "users"
+    
     const userDocRef = doc(db, 'users', selectedPatient);
     const appointmentsColRef = collection(userDocRef, 'appointments');
     const patientDocSnap = await getDoc(userDocRef);
 
     const patientName = patientDocSnap.data().name;
     
-    // Agregar nueva cita a la subcolección "appointments"
+    
     await addDoc(appointmentsColRef, {
       comentario,
       fechaCita,
@@ -76,47 +97,160 @@ const navigation = useNavigation();
     }
   };
 
+  useEffect(() => {
+    setIsLoading(true);
+  
+    const fetchAppointments = async (retries = 3, delay = 1000) => {
+      const db = getFirestore();
+      try {
+        
+        const userInfo = await AsyncStorage.getItem('@userLogged');
+        const user = userInfo ? JSON.parse(userInfo) : null;
+  
+        if (!user || !user.uid) {
+          throw new Error('User information is not available');
+        }
+  
+        const doctorId = user.uid;
+  
+        
+        const appointmentsQuery = query(collectionGroup(db, 'appointments'), where('doctorId', '==', doctorId));
+        const querySnapshot = await getDocs(appointmentsQuery);
+  
+        const appointmentsList = [];
+        querySnapshot.forEach((doc) => {
+          appointmentsList.push({ id: doc.id, ...doc.data() });
+        });
+  
+        setAppointments(appointmentsList);
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Error obteniendo las citas: ', error);
+        if (retries > 0) {
+          console.log(`Reintentando... ${retries} veces restantes.`);
+          setTimeout(() => fetchAppointments(retries - 1, delay * 2), delay); 
+        } else {
+          setIsLoading(false); 
+          
+        }
+      }
+    };
+  
+    fetchAppointments();
+  }, []);
+
+  const renderCitas = ({ item }) => (
+
+
+<View  style={styles.citaContainer}>
+<View style={styles.initialsCircle}>
+  <Text style={styles.initialsText}>{item.patientName}</Text>
+</View>
+<View style={styles.citaDetails}>
+  <Text style={styles.pacienteText}>{item.razonCita}</Text>
+  <Text style={styles.horaText}>{item.fechaCita}</Text>
+</View>
+</View>
+  );
+
+
+  
+  useEffect(() => {
+    const checkUserAppointments = async (retries = 3, delay = 1000) => {
+      setIsLoading(true);
+    
+      const db = getFirestore();
+      try {
+        const userInfo = await AsyncStorage.getItem('@userLogged');
+        const user = userInfo ? JSON.parse(userInfo) : null;
+    
+        if (!user || !user.uid) {
+          throw new Error('User inssformation is not available');
+        }
+    
+        const userId = user.uid;
+    
+        
+        const userDocRef = doc(db, 'users', userId);
+    
+        
+        const userDocSnap = await getDoc(userDocRef);
+    
+        if (userDocSnap.exists()) {
+          
+          const appointmentsCollectionRef = collection(userDocRef, 'appointments');
+    
+          
+          const appointmentsSnapshot = await getDocs(appointmentsCollectionRef);
+    
+          if (!appointmentsSnapshot.empty) {
+            
+            const appointmentsList = [];
+            appointmentsSnapshot.forEach((doc) => {
+              appointmentsList.push({ id: doc.id, ...doc.data() });
+            });
+            setAppointmentsUser(appointmentsList);
+          } else {
+            
+            console.log('User does not hawve any appointments.');
+          }
+        } else {
+          
+          console.log('User document does not exist.');
+        }
+    
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Error checking user appointments: ', error);
+        if (retries > 0) {
+          console.log(`Retrying... ${retries} attempts remaining.`);
+          setTimeout(() => checkUserAppointments(retries - 1, delay * 2), delay);
+        } else {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    checkUserAppointments()
+  }, []);
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerText}>Tus citas</Text>
-        <TouchableOpacity style={styles.addButton} onPress={toggleModal}>
+        {rol == 'DOCTOR' ?  <TouchableOpacity style={styles.addButton} onPress={toggleModal}>
           <Text style={styles.buttonText}>Agregar cita</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> : ''}
+       
       </View>
       
       <View style={styles.space} />
       <View style={styles.sectionContainer}>
         <Text style={styles.sectionHeaderText}>Mis próximas citas</Text>
-        {proximasCitas.map((cita, index) => (
-          <View key={index} style={styles.citaContainer}>
-            <View style={styles.initialsCircle}>
-              <Text style={styles.initialsText}>{cita.paciente.charAt(0)}</Text>
+        {rol == 'DOCTOR' ? (
+            <View>
+            <FlatList
+          data={appointments}
+          renderItem={renderCitas}
+          keyExtractor={(item) => item.id}
+          
+        />
             </View>
-            <View style={styles.citaDetails}>
-              <Text style={styles.pacienteText}>{cita.paciente}</Text>
-              <Text style={styles.horaText}>{cita.hora}</Text>
-            </View>
-            <Text style={styles.linkText}>Eliminar</Text>
-          </View>
-        ))}
+            ) : (
+              <View>
+              <FlatList
+            data={appointmentsUser}
+            renderItem={renderCitas}
+            keyExtractor={(item) => item.id}
+            
+          />
+              </View>            )}
+
+
+
+
       </View>
-      <View style={styles.space} />
-      <View style={styles.sectionContainer}>
-        <Text style={styles.sectionHeaderText}>Citas creadas recientemente</Text>
-        {citasRecientes.map((cita, index) => (
-          <View key={index} style={styles.citaContainer}>
-            <View style={styles.initialsCircle}>
-              <Text style={styles.initialsText}>{cita.paciente.charAt(0)}</Text>
-            </View>
-            <View style={styles.citaDetails}>
-              <Text style={styles.pacienteText}>{cita.paciente}</Text>
-              <Text style={styles.horaText}>{cita.hora}</Text>
-            </View>
-            <Text style={styles.linkText}> Eliminar</Text>
-          </View>
-        ))}
-      </View>
+
       <Modal visible={isModalVisible} animationType="slide" transparent={true}>
         <View style={styles.modalContainer}>
           <AgregarCitaForm onCancelar={toggleModal} onAgregar={agregarCita} />
@@ -137,7 +271,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#87CEFA', // Celeste
+    backgroundColor: '#87CEFA', 
     padding: 15,
     marginBottom: 10,
     borderRadius: 10,
@@ -145,19 +279,19 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#ffffff', // Texto blanco
+    color: '#ffffff', 
   },
   addButton: {
-    backgroundColor: 'transparent', // Botón transparente
-    borderWidth: 1, // Borde
-    borderStyle: 'dashed', // Estilo de línea discontinua
-    borderColor: '#000000', // Color del borde
+    backgroundColor: 'transparent', 
+    borderWidth: 1, 
+    borderStyle: 'dashed', 
+    borderColor: '#000000', 
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 20,
   },
   buttonText: {
-    color: '#000000', // Texto en negro
+    color: '#000000', 
     fontWeight: 'bold',
   },
   linkText: {
@@ -185,9 +319,9 @@ const styles = StyleSheet.create({
   },
   initialsCircle: {
     backgroundColor: '#87CEFA',
-    width: 40,
+    width: 70,
     height: 40,
-    borderRadius: 20,
+    borderRadius: 5,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 10,
@@ -212,7 +346,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fondo oscuro semi-transparente
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', 
   },
 });
 
